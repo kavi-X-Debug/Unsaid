@@ -1,7 +1,12 @@
 import { ButtonHTMLAttributes, DetailedHTMLProps } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
-type Props = DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> & {
+type BaseButtonProps = Omit<
+  DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>,
+  "onDrag"
+>;
+
+type Props = BaseButtonProps & {
   variant?: "primary" | "outline" | "ghost";
   fullWidth?: boolean;
 };
@@ -27,7 +32,7 @@ export function Button(props: Props) {
       whileHover={{ scale: hoverScale }}
       whileTap={{ scale: tapScale }}
       transition={{ duration, ease: "easeOut" }}
-      {...rest}
+      {...(rest as any)}
     />
   );
 }

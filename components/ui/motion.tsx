@@ -1,3 +1,5 @@
+ "use client";
+
 import { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
@@ -66,4 +68,3 @@ export function StaggerContainer(props: StaggerContainerProps) {
     </motion.div>
   );
 }
-
