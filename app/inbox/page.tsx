@@ -1,16 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import {
-  collection,
-  deleteDoc,
-  doc,
-  onSnapshot,
-  orderBy,
-  query,
-  updateDoc,
-  where
-} from "firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, onSnapshot, query, updateDoc, where } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { db } from "../../lib/firebase";
 import { useAuth } from "../../components/auth/auth-provider";
@@ -38,6 +29,7 @@ export default function InboxPage() {
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -49,16 +41,8 @@ export default function InboxPage() {
     if (!user?.uid) {
       return;
     }
-    const qQuery = query(
-      collection(db, "questions"),
-      where("toUserId", "==", user.uid),
-      orderBy("createdAt", "desc")
-    );
-    const pQuery = query(
-      collection(db, "polls"),
-      where("toUserId", "==", user.uid),
-      orderBy("createdAt", "desc")
-    );
+    const qQuery = query(collection(db, "questions"), where("toUserId", "==", user.uid));
+    const pQuery = query(collection(db, "polls"), where("toUserId", "==", user.uid));
     const unsubscribeQuestions = onSnapshot(qQuery, snapshot => {
       const list: InboxItem[] = [];
       snapshot.forEach(docSnap => {
@@ -93,6 +77,36 @@ export default function InboxPage() {
       unsubscribeQuestions();
       unsubscribePolls();
     };
+  }, [user?.uid]);
+
+  useEffect(() => {
+    if (!user?.uid) {
+      return;
+    }
+    const loadProfile = async () => {
+      try {
+        const ref = doc(db, "users", user.uid);
+        const snap = await getDoc(ref);
+        if (!snap.exists()) {
+          return;
+        }
+        const data = snap.data() as { username?: string };
+        if (!data.username) {
+          return;
+        }
+        const origin =
+          typeof window !== "undefined" && window.location.origin
+            ? window.location.origin
+            : "";
+        if (!origin) {
+          return;
+        }
+        setShareUrl(`${origin}/u/${data.username.toLowerCase()}`);
+      } catch {
+        setShareUrl(null);
+      }
+    };
+    loadProfile();
   }, [user?.uid]);
 
   const filtered = useMemo(() => {
@@ -390,6 +404,26 @@ export default function InboxPage() {
             Log out
           </Button>
         </header>
+
+        {shareUrl && (
+          <section className="flex items-center justify-between gap-4">
+            <div className="text-xs text-slate-500">
+              Share this link so people can send you anonymous messages:
+              <p className="mt-1 text-slate-300 break-all">{shareUrl}</p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(shareUrl);
+                } catch {}
+              }}
+            >
+              Copy link
+            </Button>
+          </section>
+        )}
 
         <section className="flex items-center justify-between gap-4">
           <Input

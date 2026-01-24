@@ -1,13 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import {
-  collection,
-  onSnapshot,
-  query,
-  where,
-  orderBy
-} from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import type { AppUser, Poll, Question } from "../../../lib/types";
 import { Card } from "../../../components/ui/card";
@@ -56,30 +50,35 @@ export function ProfilePageClient(props: Props) {
     if (!user?.uid) {
       return;
     }
-    const qQuery = query(
-      collection(db, "questions"),
-      where("toUserId", "==", user.uid),
-      where("isAnswered", "==", true),
-      where("isReported", "==", false),
-      orderBy("createdAt", "desc")
-    );
-    const pQuery = query(
-      collection(db, "polls"),
-      where("toUserId", "==", user.uid),
-      where("isPublished", "==", true),
-      orderBy("createdAt", "desc")
-    );
+    const qQuery = query(collection(db, "questions"), where("toUserId", "==", user.uid));
+    const pQuery = query(collection(db, "polls"), where("toUserId", "==", user.uid));
     const unsubQuestions = onSnapshot(qQuery, snapshot => {
       const list: Question[] = [];
       snapshot.forEach(docSnap => {
-        list.push({ id: docSnap.id, ...(docSnap.data() as Omit<Question, "id">) });
+        const data = docSnap.data() as Omit<Question, "id">;
+        if (data.isAnswered && !data.isReported) {
+          list.push({ id: docSnap.id, ...data });
+        }
+      });
+      list.sort((a, b) => {
+        const aDate = a.createdAt?.toMillis?.() ?? 0;
+        const bDate = b.createdAt?.toMillis?.() ?? 0;
+        return bDate - aDate;
       });
       setQuestions(list);
     });
     const unsubPolls = onSnapshot(pQuery, snapshot => {
       const list: Poll[] = [];
       snapshot.forEach(docSnap => {
-        list.push({ id: docSnap.id, ...(docSnap.data() as Omit<Poll, "id">) });
+        const data = docSnap.data() as Omit<Poll, "id">;
+        if (data.isPublished && !data.isReported) {
+          list.push({ id: docSnap.id, ...data });
+        }
+      });
+      list.sort((a, b) => {
+        const aDate = a.createdAt?.toMillis?.() ?? 0;
+        const bDate = b.createdAt?.toMillis?.() ?? 0;
+        return bDate - aDate;
       });
       setPolls(list);
     });
