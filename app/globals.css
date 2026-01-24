@@ -7,9 +7,17 @@
 }
 
 body {
-  @apply bg-slate-950 text-slate-50 antialiased;
+  @apply bg-slate-50 text-slate-900 antialiased;
+}
+
+.dark body {
+  @apply bg-slate-950 text-slate-50;
 }
 
 a {
+  @apply text-sky-600 hover:text-sky-500;
+}
+
+.dark a {
   @apply text-sky-400 hover:text-sky-300;
 }
