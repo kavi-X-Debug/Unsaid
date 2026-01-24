@@ -2,10 +2,12 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import type { User } from "firebase/auth";
+import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithPopup, updateProfile } from "firebase/auth";
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   query,
   serverTimestamp,
@@ -24,7 +26,44 @@ export default function SignupPage() {
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingGoogle, setLoadingGoogle] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const ensureUserProfile = async (user: User) => {
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      return;
+    }
+    const emailLocal = user.email ? user.email.split("@")[0] : "";
+    const namePart = user.displayName ? user.displayName.split(" ")[0] : "";
+    const rawBase = (emailLocal || namePart || user.uid.slice(0, 8)).toLowerCase();
+    let base = rawBase.replace(/[^a-z0-9_]/g, "");
+    if (!base) {
+      base = `user_${user.uid.slice(0, 6)}`;
+    }
+    let candidate = base;
+    let suffix = 0;
+    for (;;) {
+      const existing = await getDocs(
+        query(collection(db, "users"), where("username", "==", candidate))
+      );
+      if (existing.empty) {
+        break;
+      }
+      suffix += 1;
+      candidate = `${base}${suffix}`;
+    }
+    await setDoc(ref, {
+      uid: user.uid,
+      username: candidate,
+      bio: null,
+      createdAt: serverTimestamp(),
+      settings: {
+        positiveOnlyMode: false
+      }
+    });
+  };
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -61,6 +100,22 @@ export default function SignupPage() {
       setError("Could not create account. Check your details and try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogle = async () => {
+    setError(null);
+    setLoadingGoogle(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      const credential = await signInWithPopup(auth, provider);
+      if (credential.user) {
+        await ensureUserProfile(credential.user);
+      }
+    } catch (err) {
+      setError("Could not sign in with Google. Try again.");
+    } finally {
+      setLoadingGoogle(false);
     }
   };
 
@@ -122,6 +177,20 @@ export default function SignupPage() {
               {loading ? "Creating account..." : "Sign up"}
             </Button>
           </form>
+          <div className="flex items-center gap-2 text-xs text-slate-500 pt-2">
+            <div className="h-px flex-1 bg-slate-800" />
+            <span>or</span>
+            <div className="h-px flex-1 bg-slate-800" />
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            fullWidth
+            disabled={loadingGoogle}
+            onClick={handleGoogle}
+          >
+            {loadingGoogle ? "Connecting to Google..." : "Continue with Google"}
+          </Button>
         </Card>
         <p className="text-sm text-center text-slate-400">
           Already have an account?{" "}
