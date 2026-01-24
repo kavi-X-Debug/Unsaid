@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { cookies } from "next/headers";
 import { AuthProvider } from "../components/auth/auth-provider";
 import { ThemeProvider } from "../components/theme/theme-provider";
+import { ThemeToggle } from "../components/theme/theme-toggle";
 
 export const metadata = {
   title: "Unsaid",
@@ -18,6 +19,7 @@ export default function RootLayout(props: { children: ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <body>
         <ThemeProvider initialTheme={resolvedTheme}>
+          <ThemeToggle />
           <AuthProvider>{props.children}</AuthProvider>
         </ThemeProvider>
       </body>
