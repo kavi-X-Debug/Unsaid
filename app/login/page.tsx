@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { User } from "firebase/auth";
 import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import {
@@ -20,6 +21,7 @@ import { Card } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -68,6 +70,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      router.push("/inbox");
     } catch (err) {
       setError("Could not sign in. Check your email and password.");
     } finally {
@@ -85,6 +88,7 @@ export default function LoginPage() {
         await ensureUserProfile(credential.user);
       }
     } catch (err) {
+      console.error("Google sign-in error (login):", err);
       setError("Could not sign in with Google. Try again.");
     } finally {
       setLoadingGoogle(false);

@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FirebaseError } from "firebase/app";
 import type { User } from "firebase/auth";
 import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithPopup, updateProfile } from "firebase/auth";
@@ -22,6 +23,7 @@ import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
 
 export default function SignupPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
@@ -96,6 +98,7 @@ export default function SignupPage() {
             positiveOnlyMode: false
           }
         });
+        router.push("/inbox");
       }
     } catch (err) {
       console.error(err);
@@ -125,8 +128,10 @@ export default function SignupPage() {
       const credential = await signInWithPopup(auth, provider);
       if (credential.user) {
         await ensureUserProfile(credential.user);
+        router.push("/inbox");
       }
     } catch (err) {
+      console.error("Google sign-in error (signup):", err);
       setError("Could not sign in with Google. Try again.");
     } finally {
       setLoadingGoogle(false);
