@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { AuthProvider } from "../components/auth/auth-provider";
 import { ThemeProvider } from "../components/theme/theme-provider";
 import { ThemeToggle } from "../components/theme/theme-toggle";
+import { PageTransition } from "../components/ui/motion";
 
 export const metadata = {
   title: "Unsaid",
@@ -20,7 +21,9 @@ export default function RootLayout(props: { children: ReactNode }) {
       <body>
         <ThemeProvider initialTheme={resolvedTheme}>
           <ThemeToggle />
-          <AuthProvider>{props.children}</AuthProvider>
+          <AuthProvider>
+            <PageTransition>{props.children}</PageTransition>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

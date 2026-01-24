@@ -1,4 +1,5 @@
 import { ButtonHTMLAttributes, DetailedHTMLProps } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 
 type Props = DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> & {
   variant?: "primary" | "outline" | "ghost";
@@ -16,5 +17,17 @@ export function Button(props: Props) {
   };
   const width = fullWidth ? "w-full" : "";
   const merged = [base, variants[variant], width, className].filter(Boolean).join(" ");
-  return <button className={merged} {...rest} />;
+  const prefersReducedMotion = useReducedMotion();
+  const hoverScale = prefersReducedMotion ? 1 : 1.02;
+  const tapScale = prefersReducedMotion ? 1 : 0.97;
+  const duration = prefersReducedMotion ? 0 : 0.12;
+  return (
+    <motion.button
+      className={merged}
+      whileHover={{ scale: hoverScale }}
+      whileTap={{ scale: tapScale }}
+      transition={{ duration, ease: "easeOut" }}
+      {...rest}
+    />
+  );
 }

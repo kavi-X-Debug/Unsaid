@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
+import { FirebaseError } from "firebase/app";
 import type { User } from "firebase/auth";
 import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithPopup, updateProfile } from "firebase/auth";
 import {
@@ -97,7 +98,20 @@ export default function SignupPage() {
         });
       }
     } catch (err) {
-      setError("Could not create account. Check your details and try again.");
+      console.error(err);
+      if (err instanceof FirebaseError) {
+        if (err.code === "auth/weak-password") {
+          setError("Password must be at least 6 characters long.");
+        } else if (err.code === "auth/email-already-in-use") {
+          setError("An account with this email already exists.");
+        } else if (err.code === "auth/invalid-email") {
+          setError("Enter a valid email address.");
+        } else {
+          setError("Could not create account. Please try again.");
+        }
+      } else {
+        setError("Could not create account. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 
 type Props = {
   children: ReactNode;
@@ -12,5 +13,16 @@ export function Card(props: Props) {
   ]
     .filter(Boolean)
     .join(" ");
-  return <div className={merged}>{props.children}</div>;
+  const prefersReducedMotion = useReducedMotion();
+  const duration = prefersReducedMotion ? 0 : 0.18;
+  return (
+    <motion.div
+      className={merged}
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration, ease: "easeOut" }}
+    >
+      {props.children}
+    </motion.div>
+  );
 }

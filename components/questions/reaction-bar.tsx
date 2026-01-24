@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import type { ReactionCounts } from "../../lib/types";
 
 type Props = {
@@ -25,6 +26,9 @@ export function ReactionBar(props: Props) {
   const [current, setCurrent] = useState<ReactionKey | null>(null);
   const [hasReacted, setHasReacted] = useState(false);
   const storageKey = `unsaid_reaction_${props.questionId}`;
+  const prefersReducedMotion = useReducedMotion();
+  const tapScale = prefersReducedMotion ? 1 : 1.1;
+  const duration = prefersReducedMotion ? 0 : 0.15;
 
   useEffect(() => {
     try {
@@ -81,15 +85,17 @@ export function ReactionBar(props: Props) {
         <span>React:</span>
         <div className="flex gap-2">
           {reactionConfig.map(reaction => (
-            <button
+            <motion.button
               key={reaction.key}
               type="button"
               onClick={() => handleReact(reaction.key)}
               disabled={hasReacted}
-              className="inline-flex items-center gap-1 rounded-full bg-slate-900/80 px-2 py-1 text-slate-300 hover:bg-slate-800 transition transform active:scale-95 disabled:opacity-60 disabled:cursor-default"
+              whileTap={{ scale: tapScale }}
+              transition={{ duration, ease: "easeOut" }}
+              className="inline-flex items-center gap-1 rounded-full bg-slate-900/80 px-2 py-1 text-slate-300 hover:bg-slate-800 transition disabled:opacity-60 disabled:cursor-default"
             >
               <span>{reaction.icon}</span>
-            </button>
+            </motion.button>
           ))}
         </div>
       </div>
@@ -106,12 +112,14 @@ export function ReactionBar(props: Props) {
           }
           const isActive = current === reaction.key;
           return (
-            <button
+            <motion.button
               key={reaction.key}
               type="button"
               onClick={() => handleReact(reaction.key)}
               disabled={hasReacted}
-              className={`inline-flex items-center gap-1 rounded-full px-2 py-1 transition transform active:scale-95 ${
+              whileTap={{ scale: tapScale }}
+              transition={{ duration, ease: "easeOut" }}
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-1 transition ${
                 isActive
                   ? "bg-sky-500/10 text-sky-300"
                   : "bg-slate-900/80 text-slate-300 hover:bg-slate-800"
@@ -119,7 +127,7 @@ export function ReactionBar(props: Props) {
             >
               <span>{reaction.icon}</span>
               <span>{value}</span>
-            </button>
+            </motion.button>
           );
         })}
       </div>
@@ -127,4 +135,3 @@ export function ReactionBar(props: Props) {
     </div>
   );
 }
-

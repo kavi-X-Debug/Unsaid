@@ -20,6 +20,7 @@ import { Card } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Textarea } from "../../components/ui/textarea";
 import { Input } from "../../components/ui/input";
+import { Modal } from "../../components/ui/modal";
 
 type InboxItemType = "question" | "poll";
 
@@ -36,6 +37,7 @@ export default function InboxPage() {
   const [answerDrafts, setAnswerDrafts] = useState<Record<string, string>>({});
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -164,7 +166,7 @@ export default function InboxPage() {
     setSelectedIds(new Set());
   };
 
-  const bulkDelete = async () => {
+  const performBulkDelete = async () => {
     const ids = Array.from(selectedIds);
     await Promise.all(
       ids.map(id => {
@@ -177,6 +179,13 @@ export default function InboxPage() {
       })
     );
     clearSelection();
+  };
+
+  const bulkDelete = () => {
+    if (!selectedIds.size) {
+      return;
+    }
+    setConfirmOpen(true);
   };
 
   const answerQuestion = async (id: string) => {
@@ -332,6 +341,34 @@ export default function InboxPage() {
 
   return (
     <main className="min-h-screen px-4 py-8 flex justify-center">
+      <Modal
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        title="Bulk delete items?"
+      >
+        <p className="mb-4 text-xs text-slate-300">
+          This will permanently remove the selected questions and polls from your inbox.
+        </p>
+        <div className="flex justify-end gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setConfirmOpen(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={async () => {
+              await performBulkDelete();
+              setConfirmOpen(false);
+            }}
+          >
+            Delete
+          </Button>
+        </div>
+      </Modal>
       <div className="w-full max-w-3xl space-y-6">
         <header className="flex items-center justify-between gap-4">
           <div>
