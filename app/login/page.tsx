@@ -107,6 +107,7 @@ export default function LoginPage() {
           return;
         }
         await ensureUserProfile(credential.user);
+        router.push("/inbox");
       }
     } catch (err) {
       console.error("Google sign-in error (login):", err);
