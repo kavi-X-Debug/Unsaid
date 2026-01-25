@@ -28,7 +28,7 @@ export function ThemeToggle() {
   };
 
   return (
-    <div className="fixed top-4 right-4 z-40">
+    <div className="fixed right-4 top-16 z-40 md:top-4">
       <Button
         type="button"
         variant="outline"

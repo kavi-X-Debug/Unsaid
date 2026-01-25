@@ -5,9 +5,15 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { Playfair_Display } from "next/font/google";
 import { useAuth } from "../auth/auth-provider";
 import { db } from "../../lib/firebase";
 import logo from "../../icon.jpg";
+
+const logoFont = Playfair_Display({
+  subsets: ["latin"],
+  weight: "600"
+});
 
 export function Navbar() {
   const pathname = usePathname();
@@ -65,16 +71,18 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 z-30 border-b border-slate-200/60 bg-slate-50/80 backdrop-blur-sm dark:border-slate-800/80 dark:bg-slate-950/80">
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2">
+      <div className="mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-2">
+        <Link href="/" className="flex items-center gap-2 shrink-0">
           <div className="relative h-7 w-7 overflow-hidden rounded-full border border-slate-300 dark:border-slate-700">
             <Image src={logo} alt="Unsaid" fill sizes="28px" className="object-cover" />
           </div>
-          <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+          <span
+            className={`${logoFont.className} text-base font-semibold tracking-tight text-slate-800 dark:text-slate-100`}
+          >
             Unsaid
           </span>
         </Link>
-        <div className="flex items-center gap-1 rounded-full bg-slate-100 px-1 py-0.5 text-xs border border-slate-200 dark:bg-slate-900/80 dark:border-slate-800">
+        <div className="flex items-center gap-1 rounded-full bg-slate-100 px-1 py-0.5 text-xs border border-slate-200 dark:bg-slate-900/80 dark:border-slate-800 max-w-full overflow-x-auto">
           {links.map(link => {
             const active =
               pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));

@@ -162,12 +162,14 @@ export default function ProfilePage() {
   const [isEditingAvatar, setIsEditingAvatar] = useState(false);
   const [avatarSaving, setAvatarSaving] = useState(false);
   const [avatarMessage, setAvatarMessage] = useState<string | null>(null);
+  const [bioMessage, setBioMessage] = useState<string | null>(null);
 
   const handleSave = async () => {
     if (!user?.uid) {
       return;
     }
     const trimmedBio = bioDraft.trim().slice(0, 160);
+    setBioMessage(null);
     setSaving(true);
     try {
       const ref = doc(db, "users", user.uid);
@@ -177,6 +179,7 @@ export default function ProfilePage() {
       setSavedBio(trimmedBio);
       setBioDraft(trimmedBio);
       setIsEditingBio(false);
+      setBioMessage("Bio is changend Successfully");
     } finally {
       setSaving(false);
     }
@@ -365,7 +368,10 @@ export default function ProfilePage() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setIsEditingBio(true)}
+                    onClick={() => {
+                      setBioMessage(null);
+                      setIsEditingBio(true);
+                    }}
                     disabled={saving}
                   >
                     Change bio
@@ -399,6 +405,9 @@ export default function ProfilePage() {
               </>
             )}
           </div>
+          {bioMessage && (
+            <p className="text-xs text-emerald-400">{bioMessage}</p>
+          )}
         </Card>
 
         <Card className="p-4 space-y-4">

@@ -573,14 +573,14 @@ export default function InboxPage() {
         )}
 
         <section>
-          <Card className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 p-3 border border-slate-800/70 bg-slate-900/60">
+          <Card className="flex flex-col gap-3 p-3 border border-slate-800/70 bg-slate-900/60 sm:flex-row sm:items-center sm:justify-between">
             <Input
               placeholder="Search by keyword"
               value={search}
               onChange={event => setSearch(event.target.value)}
             />
             {selectedIds.size > 0 && (
-              <div className="flex items-center gap-2 text-xs">
+              <div className="flex flex-wrap items-center gap-2 text-xs sm:justify-end">
                 <span className="text-slate-300">
                   {selectedIds.size} selected
                 </span>
