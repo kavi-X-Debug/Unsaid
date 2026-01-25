@@ -328,9 +328,6 @@ export function ProfilePageClient(props: Props) {
             >
               {copied ? "Link copied" : "Share profile"}
             </Button>
-            <p className="text-[11px] text-slate-500">
-              {props.stats.totalViews.toLocaleString()} profile views
-            </p>
           </div>
         </motion.header>
 
@@ -509,6 +506,14 @@ export function ProfilePageClient(props: Props) {
                         : Math.round(((option.voteCount ?? 0) / totalVotes) * 100);
                     const hasVoted = pollVotes[poll.id] != null;
                     const isChosen = pollVotes[poll.id] === index;
+                    const ownerChosen =
+                      typeof poll.ownerSelection === "number" &&
+                      poll.ownerSelection === index;
+                    const optionTextClass = ownerChosen
+                      ? "text-sky-700 font-semibold dark:text-sky-300"
+                      : isChosen
+                        ? "text-emerald-400 font-medium dark:text-emerald-300"
+                        : "text-slate-800 dark:text-slate-200";
                     return (
                       <button
                         key={option.optionText}
@@ -518,23 +523,21 @@ export function ProfilePageClient(props: Props) {
                         className="w-full text-left"
                       >
                         <div className="flex items-center justify-between text-xs mb-1">
-                          <span
-                            className={
-                              isChosen
-                                ? "text-sky-700 font-medium dark:text-sky-300"
-                                : "text-slate-800 dark:text-slate-200"
-                            }
-                          >
-                            {option.optionText}
-                          </span>
+                          <span className={optionTextClass}>{option.optionText}</span>
                           <span className="text-slate-600 dark:text-slate-400">
-                            {option.voteCount ?? 0}·{percentage}%
+                            {option.voteCount ?? 0}{" "}
+                            {(option.voteCount ?? 0) === 1 ? "vote" : "votes"}
+                            {ownerChosen && (
+                              <span className="ml-1 text-[10px] text-sky-400">
+                                • Owner&apos;s choice
+                              </span>
+                            )}
                           </span>
                         </div>
                         <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden">
                           <div
                             className={`h-full rounded-full transition-all ${
-                              isChosen ? "bg-sky-500" : "bg-slate-600"
+                              ownerChosen ? "bg-sky-500" : "bg-slate-600"
                             }`}
                             style={{ width: `${percentage}%` }}
                           />
@@ -543,13 +546,6 @@ export function ProfilePageClient(props: Props) {
                     );
                   })}
                 </div>
-                {typeof poll.ownerSelection === "number" &&
-                  poll.ownerSelection >= 0 &&
-                  poll.ownerSelection < poll.options.length && (
-                    <p className="text-[11px] text-slate-600 dark:text-slate-500">
-                      Owner&apos;s choice: {poll.options[poll.ownerSelection].optionText}
-                    </p>
-                  )}
               </Card>
             ))}
           </StaggerContainer>

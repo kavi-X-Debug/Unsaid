@@ -5,14 +5,14 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { Playfair_Display } from "next/font/google";
+import { Kaushan_Script } from "next/font/google";
 import { useAuth } from "../auth/auth-provider";
 import { db } from "../../lib/firebase";
 import logo from "../../icon.jpg";
 
-const logoFont = Playfair_Display({
+const logoFont = Kaushan_Script({
   subsets: ["latin"],
-  weight: "600"
+  weight: "400"
 });
 
 export function Navbar() {
