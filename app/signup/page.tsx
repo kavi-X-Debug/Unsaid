@@ -183,15 +183,15 @@ export default function SignupPage() {
               <label className="text-sm font-medium text-slate-800 dark:text-slate-200">
                 Confirm password
               </label>
-          <Input
-            type="password"
-            autoComplete="new-password"
-            value={confirmPassword}
-            onChange={event => setConfirmPassword(event.target.value)}
-            required
-            minLength={6}
-          />
-        </div>
+              <Input
+                type="password"
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={event => setConfirmPassword(event.target.value)}
+                required
+                minLength={6}
+              />
+            </div>
             {error && <p className="text-sm text-rose-400">{error}</p>}
             {message && <p className="text-sm text-emerald-400">{message}</p>}
             <Button type="submit" fullWidth disabled={loading}>
