@@ -245,11 +245,11 @@ export default function InboxPage() {
               onChange={() => toggleSelect(item.id)}
             />
             <div className="flex-1 space-y-2">
-              <p className="text-sm text-slate-200 whitespace-pre-wrap">
+              <p className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
                 {question.questionText}
               </p>
               {question.isAnswered && question.answerText && (
-                <p className="text-sm text-slate-300 whitespace-pre-wrap">
+                <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
                   {question.answerText}
                 </p>
               )}
@@ -298,10 +298,10 @@ export default function InboxPage() {
             onChange={() => toggleSelect(item.id)}
           />
           <div className="flex-1 space-y-2">
-            <p className="text-sm text-slate-200 whitespace-pre-wrap">
+            <p className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
               {questionText ?? "Poll"}
             </p>
-            <ul className="space-y-1 text-xs text-slate-400">
+            <ul className="space-y-1 text-xs text-slate-600 dark:text-slate-400">
               {poll.options.map(option => (
                 <li key={option.optionText}>{option.optionText}</li>
               ))}
@@ -325,18 +325,26 @@ export default function InboxPage() {
   const renderTabContent = (key: string) => {
     if (key === "new") {
       if (grouped.newItems.length === 0) {
-        return <p className="text-sm text-slate-500">Nothing new yet.</p>;
+        return (
+          <p className="text-sm text-slate-500 dark:text-slate-500">Nothing new yet.</p>
+        );
       }
       return <div className="space-y-3">{grouped.newItems.map(renderItem)}</div>;
     }
     if (key === "answered") {
       if (grouped.answered.length === 0) {
-        return <p className="text-sm text-slate-500">No answered items yet.</p>;
+        return (
+          <p className="text-sm text-slate-500 dark:text-slate-500">
+            No answered items yet.
+          </p>
+        );
       }
       return <div className="space-y-3">{grouped.answered.map(renderItem)}</div>;
     }
     if (grouped.reported.length === 0) {
-      return <p className="text-sm text-slate-500">No reported items.</p>;
+      return (
+        <p className="text-sm text-slate-500 dark:text-slate-500">No reported items.</p>
+      );
     }
     return <div className="space-y-3">{grouped.reported.map(renderItem)}</div>;
   };
@@ -344,7 +352,7 @@ export default function InboxPage() {
   if (!user && loading) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <p className="text-slate-400">Loading inbox...</p>
+        <p className="text-slate-500 dark:text-slate-400">Loading inbox...</p>
       </main>
     );
   }
@@ -360,7 +368,7 @@ export default function InboxPage() {
         onClose={() => setConfirmOpen(false)}
         title="Bulk delete items?"
       >
-        <p className="mb-4 text-xs text-slate-300">
+        <p className="mb-4 text-xs text-slate-700 dark:text-slate-300">
           This will permanently remove the selected questions and polls from your inbox.
         </p>
         <div className="flex justify-end gap-2">
@@ -387,7 +395,7 @@ export default function InboxPage() {
         <header className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold">Smart inbox</h1>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-600 dark:text-slate-500">
               Manage your anonymous questions and polls in one place.
             </p>
           </div>
@@ -409,7 +417,9 @@ export default function InboxPage() {
           <section className="flex items-center justify-between gap-4">
             <div className="text-xs text-slate-500">
               Share this link so people can send you anonymous messages:
-              <p className="mt-1 text-slate-300 break-all">{shareUrl}</p>
+              <p className="mt-1 text-slate-700 dark:text-slate-300 break-all">
+                {shareUrl}
+              </p>
             </div>
             <Button
               type="button"
@@ -433,7 +443,9 @@ export default function InboxPage() {
           />
           {selectedIds.size > 0 && (
             <div className="flex items-center gap-2 text-xs">
-              <span className="text-slate-400">{selectedIds.size} selected</span>
+              <span className="text-slate-600 dark:text-slate-400">
+                {selectedIds.size} selected
+              </span>
               <Button variant="ghost" type="button" onClick={clearSelection}>
                 Clear
               </Button>

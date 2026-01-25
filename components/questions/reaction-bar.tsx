@@ -81,7 +81,7 @@ export function ReactionBar(props: Props) {
   const total = counts.heart + counts.laugh + counts.wow;
   if (total === 0) {
     return (
-      <div className="flex items-center gap-3 text-xs text-slate-500">
+      <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-500">
         <span>React:</span>
         <div className="flex gap-2">
           {reactionConfig.map(reaction => (
@@ -92,7 +92,7 @@ export function ReactionBar(props: Props) {
               disabled={hasReacted}
               whileTap={{ scale: tapScale }}
               transition={{ duration, ease: "easeOut" }}
-              className="inline-flex items-center gap-1 rounded-full bg-slate-900/80 px-2 py-1 text-slate-300 hover:bg-slate-800 transition disabled:opacity-60 disabled:cursor-default"
+              className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 text-slate-700 hover:bg-slate-200 transition disabled:opacity-60 disabled:cursor-default dark:bg-slate-900/80 dark:text-slate-300 dark:hover:bg-slate-800"
             >
               <span>{reaction.icon}</span>
             </motion.button>
@@ -103,7 +103,7 @@ export function ReactionBar(props: Props) {
   }
 
   return (
-    <div className="flex items-center justify-between text-xs text-slate-400">
+    <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
       <div className="flex items-center gap-3">
         {reactionConfig.map(reaction => {
           const value = counts[reaction.key];
@@ -121,8 +121,8 @@ export function ReactionBar(props: Props) {
               transition={{ duration, ease: "easeOut" }}
               className={`inline-flex items-center gap-1 rounded-full px-2 py-1 transition ${
                 isActive
-                  ? "bg-sky-500/10 text-sky-300"
-                  : "bg-slate-900/80 text-slate-300 hover:bg-slate-800"
+                  ? "bg-sky-100 text-sky-600 dark:bg-sky-500/10 dark:text-sky-300"
+                  : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-900/80 dark:text-slate-300 dark:hover:bg-slate-800"
               } disabled:opacity-60 disabled:cursor-default`}
             >
               <span>{reaction.icon}</span>

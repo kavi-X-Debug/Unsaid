@@ -8,7 +8,7 @@ export default function LandingPage() {
           <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
             Anonymous questions, polls, and reactions for real connections
           </h1>
-          <p className="text-slate-300">
+          <p className="text-slate-600 dark:text-slate-300">
             Unsaid lets anyone send you anonymous messages and polls while you stay in
             control with a smart inbox, reactions, and safety tools.
           </p>
@@ -21,12 +21,12 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/login"
-              className="inline-flex items-center justify-center rounded-full border border-slate-700 px-6 py-3 text-sm font-medium text-slate-100 hover:bg-slate-900 transition"
+              className="inline-flex items-center justify-center rounded-full border border-slate-300 px-6 py-3 text-sm font-medium text-slate-900 hover:bg-slate-100 transition dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-900"
             >
               Log in
             </Link>
           </div>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Built with Next.js, Firebase, and Tailwind. Optimized for Vercel.
           </p>
         </div>

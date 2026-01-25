@@ -8,7 +8,7 @@ type Props = {
 
 export function Card(props: Props) {
   const merged = [
-    "rounded-2xl border border-slate-800 bg-slate-900/60 backdrop-blur-sm shadow-sm",
+    "rounded-2xl border border-slate-200 bg-white/80 backdrop-blur-sm shadow-sm dark:border-slate-800 dark:bg-slate-900/60",
     props.className
   ]
     .filter(Boolean)

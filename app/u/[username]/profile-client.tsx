@@ -1,26 +1,32 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { db } from "../../../lib/firebase";
+import { motion, useReducedMotion } from "framer-motion";
 import type { AppUser, Poll, Question } from "../../../lib/types";
 import { Card } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Textarea } from "../../../components/ui/textarea";
 import { Input } from "../../../components/ui/input";
 import { ReactionBar } from "../../../components/questions/reaction-bar";
-
-type Props = {
-  username: string;
-};
+import { StaggerContainer } from "../../../components/ui/motion";
 
 type PollDraftType = "yes_no" | "multiple_choice";
 
+type ProfileStats = {
+  totalQuestions: number;
+  totalAnswered: number;
+};
+
+type Props = {
+  username: string;
+  user: AppUser;
+  stats: ProfileStats;
+  questions: Question[];
+  polls: Poll[];
+};
+
 export function ProfilePageClient(props: Props) {
-  const [user, setUser] = useState<AppUser | null>(null);
-  const [loadingUser, setLoadingUser] = useState(true);
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [polls, setPolls] = useState<Poll[]>([]);
   const [questionText, setQuestionText] = useState("");
   const [pollType, setPollType] = useState<PollDraftType>("yes_no");
   const [pollQuestion, setPollQuestion] = useState("");
@@ -29,69 +35,36 @@ export function ProfilePageClient(props: Props) {
   const [error, setError] = useState<string | null>(null);
   const [pollVotes, setPollVotes] = useState<Record<string, number | null>>({});
 
-  useEffect(() => {
-    const userQuery = query(
-      collection(db, "users"),
-      where("username", "==", props.username)
-    );
-    const unsub = onSnapshot(userQuery, snapshot => {
-      if (snapshot.empty) {
-        setUser(null);
-      } else {
-        const docData = snapshot.docs[0];
-        setUser(docData.data() as AppUser);
-      }
-      setLoadingUser(false);
-    });
-    return () => unsub();
-  }, [props.username]);
+  const prefersReducedMotion = useReducedMotion();
+  const duration = prefersReducedMotion ? 0 : 0.18;
 
-  useEffect(() => {
-    if (!user?.uid) {
-      return;
+  const profileTitle = useMemo(() => {
+    return `@${props.user.username}`;
+  }, [props.user.username]);
+
+  const displayBio = useMemo(() => {
+    if (!props.user.bio) {
+      return "";
     }
-    const qQuery = query(collection(db, "questions"), where("toUserId", "==", user.uid));
-    const pQuery = query(collection(db, "polls"), where("toUserId", "==", user.uid));
-    const unsubQuestions = onSnapshot(qQuery, snapshot => {
-      const list: Question[] = [];
-      snapshot.forEach(docSnap => {
-        const data = docSnap.data() as Omit<Question, "id">;
-        if (data.isAnswered && !data.isReported) {
-          list.push({ id: docSnap.id, ...data });
-        }
-      });
-      list.sort((a, b) => {
-        const aDate = a.createdAt?.toMillis?.() ?? 0;
-        const bDate = b.createdAt?.toMillis?.() ?? 0;
-        return bDate - aDate;
-      });
-      setQuestions(list);
-    });
-    const unsubPolls = onSnapshot(pQuery, snapshot => {
-      const list: Poll[] = [];
-      snapshot.forEach(docSnap => {
-        const data = docSnap.data() as Omit<Poll, "id">;
-        if (data.isPublished && !data.isReported) {
-          list.push({ id: docSnap.id, ...data });
-        }
-      });
-      list.sort((a, b) => {
-        const aDate = a.createdAt?.toMillis?.() ?? 0;
-        const bDate = b.createdAt?.toMillis?.() ?? 0;
-        return bDate - aDate;
-      });
-      setPolls(list);
-    });
-    return () => {
-      unsubQuestions();
-      unsubPolls();
-    };
-  }, [user?.uid]);
+    const trimmed = props.user.bio.trim();
+    if (trimmed.length <= 160) {
+      return trimmed;
+    }
+    return `${trimmed.slice(0, 157)}...`;
+  }, [props.user.bio]);
+
+  const avatarLetter = useMemo(() => {
+    const username = props.user.username || props.username;
+    if (!username) {
+      return "U";
+    }
+    return username.charAt(0).toUpperCase();
+  }, [props.user.username, props.username]);
 
   useEffect(() => {
     const next: Record<string, number | null> = {};
     try {
-      polls.forEach(poll => {
+      props.polls.forEach(poll => {
         const key = `unsaid_poll_vote_${poll.id}`;
         const stored = window.localStorage.getItem(key);
         if (stored !== null) {
@@ -102,33 +75,9 @@ export function ProfilePageClient(props: Props) {
         }
       });
     } catch {
-      // ignore
     }
     setPollVotes(next);
-  }, [polls]);
-
-  const profileTitle = useMemo(() => {
-    if (!user) {
-      return `@${props.username}`;
-    }
-    return `@${user.username}`;
-  }, [user, props.username]);
-
-  if (loadingUser) {
-    return (
-      <main className="min-h-screen flex items-center justify-center">
-        <p className="text-slate-400">Loading profile...</p>
-      </main>
-    );
-  }
-
-  if (!user) {
-    return (
-      <main className="min-h-screen flex items-center justify-center">
-        <p className="text-slate-400">Profile not found.</p>
-      </main>
-    );
-  }
+  }, [props.polls]);
 
   const handleAsk = async () => {
     setError(null);
@@ -144,7 +93,7 @@ export function ProfilePageClient(props: Props) {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          toUserId: user.uid,
+          toUserId: props.user.uid,
           questionText: questionText.trim()
         })
       });
@@ -177,7 +126,7 @@ export function ProfilePageClient(props: Props) {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          toUserId: user.uid,
+          toUserId: props.user.uid,
           pollType,
           questionText: pollQuestion.trim(),
           options: trimmedOptions
@@ -231,17 +180,53 @@ export function ProfilePageClient(props: Props) {
   return (
     <main className="min-h-screen px-4 py-10 flex justify-center">
       <div className="w-full max-w-2xl space-y-6">
-        <header className="space-y-2">
-          <h1 className="text-3xl font-semibold">{profileTitle}</h1>
-          {user.bio && <p className="text-slate-300">{user.bio}</p>}
-          <p className="text-xs text-slate-500">
-            Send an anonymous question or poll. Your identity is never stored.
-          </p>
-        </header>
+        <motion.header
+          className="space-y-3 flex items-center gap-4"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration, ease: "easeOut" }}
+        >
+          <div className="relative h-16 w-16 rounded-full bg-sky-500/10 border border-sky-500 flex items-center justify-center text-lg font-semibold text-sky-600 dark:text-sky-300 overflow-hidden">
+            {props.user.avatarUrl ? (
+              <Image src={props.user.avatarUrl} alt={profileTitle} fill className="object-cover" />
+            ) : (
+              avatarLetter
+            )}
+          </div>
+          <div className="space-y-1">
+            <h1 className="text-2xl font-semibold">{profileTitle}</h1>
+            {displayBio && (
+              <p className="text-sm text-slate-700 dark:text-slate-300">{displayBio}</p>
+            )}
+            <p className="text-xs text-slate-600 dark:text-slate-500">
+              Send an anonymous question or poll. Your identity is never stored.
+            </p>
+          </div>
+        </motion.header>
+
+        <Card className="p-4">
+          <div className="flex items-center justify-between text-xs sm:text-sm">
+            <div className="space-y-1">
+              <p className="text-slate-500 dark:text-slate-400">Questions received</p>
+              <p className="text-lg font-semibold">
+                {props.stats.totalQuestions.toLocaleString()}
+              </p>
+            </div>
+            <div className="h-10 w-px bg-slate-200 dark:bg-slate-800" />
+            <div className="space-y-1 text-right">
+              <p className="text-slate-500 dark:text-slate-400">Questions answered</p>
+              <p className="text-lg font-semibold">
+                {props.stats.totalAnswered.toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </Card>
 
         <section className="space-y-4">
           <Card className="p-4 space-y-3">
-            <h2 className="text-sm font-semibold text-slate-200">Ask a question</h2>
+            <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+              Ask a question
+            </h2>
             <Textarea
               rows={3}
               value={questionText}
@@ -254,15 +239,17 @@ export function ProfilePageClient(props: Props) {
           </Card>
 
           <Card className="p-4 space-y-3">
-            <h2 className="text-sm font-semibold text-slate-200">Send a poll</h2>
+            <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+              Send a poll
+            </h2>
             <div className="flex gap-2 text-xs">
               <button
                 type="button"
                 onClick={() => setPollType("yes_no")}
-                className={`flex-1 rounded-full px-3 py-1 border ${
+                className={`flex-1 rounded-full px-3 py-1 border text-xs ${
                   pollType === "yes_no"
-                    ? "border-sky-500 bg-sky-500/10 text-sky-300"
-                    : "border-slate-700 text-slate-300"
+                    ? "border-sky-500 bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300"
+                    : "border-slate-300 text-slate-700 dark:border-slate-700 dark:text-slate-300"
                 }`}
               >
                 Yes / No
@@ -270,10 +257,10 @@ export function ProfilePageClient(props: Props) {
               <button
                 type="button"
                 onClick={() => setPollType("multiple_choice")}
-                className={`flex-1 rounded-full px-3 py-1 border ${
+                className={`flex-1 rounded-full px-3 py-1 border text-xs ${
                   pollType === "multiple_choice"
-                    ? "border-sky-500 bg-sky-500/10 text-sky-300"
-                    : "border-slate-700 text-slate-300"
+                    ? "border-sky-500 bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300"
+                    : "border-slate-300 text-slate-700 dark:border-slate-700 dark:text-slate-300"
                 }`}
               >
                 Multiple choice
@@ -318,19 +305,23 @@ export function ProfilePageClient(props: Props) {
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-slate-200">Answered questions</h2>
-          {questions.length === 0 && (
-            <p className="text-sm text-slate-500">No answered questions yet.</p>
+          <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+            Answered questions
+          </h2>
+          {props.questions.length === 0 && (
+            <p className="text-sm text-slate-600 dark:text-slate-500">
+              No answered questions yet.
+            </p>
           )}
-          <div className="space-y-3">
-            {questions.map(question => (
+          <StaggerContainer>
+            {props.questions.map(question => (
               <Card key={question.id} className="p-4 space-y-3">
                 <div className="space-y-2">
-                  <p className="text-sm text-slate-200 whitespace-pre-wrap">
+                  <p className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
                     {question.questionText}
                   </p>
                   {question.answerText && (
-                    <p className="text-sm text-slate-300 whitespace-pre-wrap">
+                    <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
                       {question.answerText}
                     </p>
                   )}
@@ -341,16 +332,20 @@ export function ProfilePageClient(props: Props) {
                 />
               </Card>
             ))}
-          </div>
+          </StaggerContainer>
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-slate-200">Published polls</h2>
-          {polls.length === 0 && <p className="text-sm text-slate-500">No polls yet.</p>}
-          <div className="space-y-3">
-            {polls.map(poll => (
+          <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+            Published polls
+          </h2>
+          {props.polls.length === 0 && (
+            <p className="text-sm text-slate-600 dark:text-slate-500">No polls yet.</p>
+          )}
+          <StaggerContainer>
+            {props.polls.map(poll => (
               <Card key={poll.id} className="p-4 space-y-3">
-                <p className="text-sm text-slate-200 whitespace-pre-wrap">
+                <p className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
                   {poll.questionText ?? "Poll"}
                 </p>
                 <div className="space-y-2">
@@ -376,12 +371,14 @@ export function ProfilePageClient(props: Props) {
                         <div className="flex items-center justify-between text-xs mb-1">
                           <span
                             className={
-                              isChosen ? "text-sky-300 font-medium" : "text-slate-200"
+                              isChosen
+                                ? "text-sky-700 font-medium dark:text-sky-300"
+                                : "text-slate-800 dark:text-slate-200"
                             }
                           >
                             {option.optionText}
                           </span>
-                          <span className="text-slate-400">
+                          <span className="text-slate-600 dark:text-slate-400">
                             {option.voteCount ?? 0}·{percentage}%
                           </span>
                         </div>
@@ -399,7 +396,7 @@ export function ProfilePageClient(props: Props) {
                 </div>
               </Card>
             ))}
-          </div>
+          </StaggerContainer>
         </section>
       </div>
     </main>

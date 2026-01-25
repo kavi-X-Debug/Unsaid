@@ -26,21 +26,24 @@ export function Modal(props: ModalProps) {
           onClick={props.onClose}
         >
           <motion.div
-            className="w-full max-w-sm rounded-2xl bg-slate-900 border border-slate-700 p-4 shadow-xl"
+            className="w-full max-w-sm rounded-2xl bg-white border border-slate-200 p-4 shadow-xl dark:bg-slate-900 dark:border-slate-700"
             initial={{ opacity: 0, scale: 0.9, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 4 }}
             transition={{ duration, ease: "easeOut" }}
             onClick={event => event.stopPropagation()}
-          >
+            >
             {props.title && (
-              <h2 className="text-sm font-semibold mb-2 text-slate-100">{props.title}</h2>
+              <h2 className="text-sm font-semibold mb-2 text-slate-900 dark:text-slate-100">
+                {props.title}
+              </h2>
             )}
-            <div className="text-sm text-slate-200">{props.children}</div>
+            <div className="text-sm text-slate-700 dark:text-slate-200">
+              {props.children}
+            </div>
           </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
   );
 }
-

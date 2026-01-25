@@ -34,7 +34,7 @@ export function ThemeToggle() {
         variant="outline"
         onClick={handleToggle}
         aria-label={effectiveDark ? "Switch to light theme" : "Switch to dark theme"}
-        className="h-9 w-9 rounded-full flex items-center justify-center bg-slate-950/70 border border-slate-700 hover:border-sky-500 focus-visible:ring-offset-slate-950 transition-colors"
+        className="h-9 w-9 rounded-full flex items-center justify-center bg-white/80 border border-slate-300 hover:border-sky-500 dark:bg-slate-950/70 dark:border-slate-700 transition-colors"
       >
         <AnimatePresence mode="wait" initial={false}>
           {effectiveDark ? (

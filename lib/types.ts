@@ -8,6 +8,7 @@ export type AppUser = {
   uid: string;
   username: string;
   bio?: string;
+  avatarUrl?: string;
   createdAt: Timestamp | null;
   settings: UserSettings;
 };

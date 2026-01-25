@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FirebaseError } from "firebase/app";
 import type { User } from "firebase/auth";
-import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithPopup, updateProfile } from "firebase/auth";
+import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import {
   collection,
   doc,
@@ -20,14 +20,12 @@ import { auth, db } from "../../lib/firebase";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
-import { Textarea } from "../../components/ui/textarea";
 
 export default function SignupPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
-  const [bio, setBio] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingGoogle, setLoadingGoogle] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -71,33 +69,15 @@ export default function SignupPage() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setError(null);
-    const trimmedUsername = username.trim().toLowerCase();
-    if (!trimmedUsername.match(/^[a-z0-9_]{3,20}$/)) {
-      setError("Choose a username with 3-20 characters: letters, numbers, underscores.");
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
       return;
     }
     setLoading(true);
     try {
-      const existing = await getDocs(
-        query(collection(db, "users"), where("username", "==", trimmedUsername))
-      );
-      if (!existing.empty) {
-        setError("That username is already taken.");
-        setLoading(false);
-        return;
-      }
       const credential = await createUserWithEmailAndPassword(auth, email, password);
       if (credential.user) {
-        await updateProfile(credential.user, { displayName: trimmedUsername });
-        await setDoc(doc(db, "users", credential.user.uid), {
-          uid: credential.user.uid,
-          username: trimmedUsername,
-          bio: bio.trim() || null,
-          createdAt: serverTimestamp(),
-          settings: {
-            positiveOnlyMode: false
-          }
-        });
+        await ensureUserProfile(credential.user);
         router.push("/inbox");
       }
     } catch (err) {
@@ -147,7 +127,9 @@ export default function SignupPage() {
         <Card className="p-6 space-y-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1 text-left">
-              <label className="text-sm font-medium text-slate-200">Email</label>
+              <label className="text-sm font-medium text-slate-800 dark:text-slate-200">
+                Email
+              </label>
               <Input
                 type="email"
                 autoComplete="email"
@@ -157,7 +139,9 @@ export default function SignupPage() {
               />
             </div>
             <div className="space-y-1 text-left">
-              <label className="text-sm font-medium text-slate-200">Password</label>
+              <label className="text-sm font-medium text-slate-800 dark:text-slate-200">
+                Password
+              </label>
               <Input
                 type="password"
                 autoComplete="new-password"
@@ -168,27 +152,16 @@ export default function SignupPage() {
               />
             </div>
             <div className="space-y-1 text-left">
-              <label className="text-sm font-medium text-slate-200">Username</label>
-              <div className="flex items-center gap-2">
-                <span className="text-slate-500 text-sm">unsaid.app/u/</span>
-                <Input
-                  value={username}
-                  onChange={event => setUsername(event.target.value)}
-                  required
-                  placeholder="yourname"
-                />
-              </div>
-              <p className="text-xs text-slate-500">
-                3-20 characters. Lowercase letters, numbers, and underscores.
-              </p>
-            </div>
-            <div className="space-y-1 text-left">
-              <label className="text-sm font-medium text-slate-200">Bio</label>
-              <Textarea
-                rows={3}
-                value={bio}
-                onChange={event => setBio(event.target.value)}
-                placeholder="Optional. Say something about yourself."
+              <label className="text-sm font-medium text-slate-800 dark:text-slate-200">
+                Confirm password
+              </label>
+              <Input
+                type="password"
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={event => setConfirmPassword(event.target.value)}
+                required
+                minLength={6}
               />
             </div>
             {error && <p className="text-sm text-rose-400">{error}</p>}
@@ -196,10 +169,10 @@ export default function SignupPage() {
               {loading ? "Creating account..." : "Sign up"}
             </Button>
           </form>
-          <div className="flex items-center gap-2 text-xs text-slate-500 pt-2">
-            <div className="h-px flex-1 bg-slate-800" />
+          <div className="flex items-center gap-2 text-xs text-slate-500 pt-2 dark:text-slate-500">
+            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
             <span>or</span>
-            <div className="h-px flex-1 bg-slate-800" />
+            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
           </div>
           <Button
             type="button"
@@ -211,7 +184,7 @@ export default function SignupPage() {
             {loadingGoogle ? "Connecting to Google..." : "Continue with Google"}
           </Button>
         </Card>
-        <p className="text-sm text-center text-slate-400">
+        <p className="text-sm text-center text-slate-500 dark:text-slate-400">
           Already have an account?{" "}
           <Link href="/login" className="text-sky-400 hover:text-sky-300">
             Log in

@@ -102,7 +102,9 @@ export default function LoginPage() {
         <Card className="p-6 space-y-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1 text-left">
-              <label className="text-sm font-medium text-slate-200">Email</label>
+              <label className="text-sm font-medium text-slate-800 dark:text-slate-200">
+                Email
+              </label>
               <Input
                 type="email"
                 autoComplete="email"
@@ -112,7 +114,9 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-1 text-left">
-              <label className="text-sm font-medium text-slate-200">Password</label>
+              <label className="text-sm font-medium text-slate-800 dark:text-slate-200">
+                Password
+              </label>
               <Input
                 type="password"
                 autoComplete="current-password"
@@ -127,10 +131,10 @@ export default function LoginPage() {
               {loading ? "Signing in..." : "Log in"}
             </Button>
           </form>
-          <div className="flex items-center gap-2 text-xs text-slate-500 pt-2">
-            <div className="h-px flex-1 bg-slate-800" />
+          <div className="flex items-center gap-2 text-xs text-slate-500 pt-2 dark:text-slate-500">
+            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
             <span>or</span>
-            <div className="h-px flex-1 bg-slate-800" />
+            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
           </div>
           <Button
             type="button"
@@ -142,7 +146,7 @@ export default function LoginPage() {
             {loadingGoogle ? "Connecting to Google..." : "Continue with Google"}
           </Button>
         </Card>
-        <p className="text-sm text-center text-slate-400">
+        <p className="text-sm text-center text-slate-500 dark:text-slate-400">
           New here?{" "}
           <Link href="/signup" className="text-sky-400 hover:text-sky-300">
             Create an account
