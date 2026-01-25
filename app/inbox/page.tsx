@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import {
   collection,
   deleteDoc,
@@ -371,7 +372,75 @@ export default function InboxPage() {
       const question = item.data as Question;
       const isSelected = selectedIds.has(item.id);
       return (
-        <Card key={item.id} className="p-4 space-y-3">
+        <motion.div
+          key={item.id}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.18, ease: "easeOut" }}
+          whileHover={{ y: -2 }}
+        >
+          <Card className="p-4 space-y-3 border border-slate-800/70 bg-slate-900/50 hover:border-sky-500/70 hover:bg-slate-900/90 transition-colors">
+            <div className="flex items-start gap-2">
+              <input
+                type="checkbox"
+                className="mt-1 h-4 w-4 rounded border-slate-700 bg-slate-900"
+                checked={isSelected}
+                onChange={() => toggleSelect(item.id)}
+              />
+              <div className="flex-1 space-y-2">
+                <p className="text-sm text-slate-100 whitespace-pre-wrap">
+                  {question.questionText}
+                </p>
+                {question.isAnswered && question.answerText && (
+                  <p className="text-sm text-slate-300 whitespace-pre-wrap">
+                    {question.answerText}
+                  </p>
+                )}
+                {!question.isAnswered && (
+                  <div className="space-y-2">
+                    <Textarea
+                      rows={2}
+                      value={answerDrafts[item.id] ?? ""}
+                      onChange={event =>
+                        setAnswerDrafts(previous => ({
+                          ...previous,
+                          [item.id]: event.target.value
+                        }))
+                      }
+                      placeholder="Write your answer..."
+                    />
+                    <div className="flex gap-2 justify-end">
+                      <Button
+                        variant="ghost"
+                        type="button"
+                        onClick={() => reportItem(item)}
+                      >
+                        Report
+                      </Button>
+                      <Button type="button" onClick={() => answerQuestion(item.id)}>
+                        Answer and publish
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+      );
+    }
+    const poll = item.data as Poll;
+    const isSelected = selectedIds.has(item.id);
+    const questionText = poll.questionText;
+    return (
+      <motion.div
+        key={item.id}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.18, ease: "easeOut" }}
+        whileHover={{ y: -2 }}
+      >
+        <Card className="p-4 space-y-3 border border-slate-800/70 bg-slate-900/50 hover:border-sky-500/70 hover:bg-slate-900/90 transition-colors">
           <div className="flex items-start gap-2">
             <input
               type="checkbox"
@@ -380,100 +449,48 @@ export default function InboxPage() {
               onChange={() => toggleSelect(item.id)}
             />
             <div className="flex-1 space-y-2">
-              <p className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
-                {question.questionText}
+              <p className="text-sm text-slate-100 whitespace-pre-wrap">
+                {questionText ?? "Poll"}
               </p>
-              {question.isAnswered && question.answerText && (
-                <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
-                  {question.answerText}
-                </p>
-              )}
-              {!question.isAnswered && (
-                <div className="space-y-2">
-                  <Textarea
-                    rows={2}
-                    value={answerDrafts[item.id] ?? ""}
-                    onChange={event =>
-                      setAnswerDrafts(previous => ({
-                        ...previous,
-                        [item.id]: event.target.value
-                      }))
-                    }
-                    placeholder="Write your answer..."
-                  />
-                  <div className="flex gap-2 justify-end">
-                    <Button
-                      variant="ghost"
+              <div className="space-y-1 text-xs">
+                {poll.options.map((option, index) => {
+                  const selectedIndex = pollSelections[item.id] ?? null;
+                  const isSelectedOption = selectedIndex === index;
+                  return (
+                    <button
+                      key={option.optionText}
                       type="button"
-                      onClick={() => reportItem(item)}
+                      onClick={() =>
+                        setPollSelections(previous => ({
+                          ...previous,
+                          [item.id]: index
+                        }))
+                      }
+                      className={`w-full text-left rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150 ${
+                        isSelectedOption
+                          ? "bg-sky-500/15 text-sky-300 border border-sky-500/70"
+                          : "bg-slate-900/40 text-slate-300 border border-slate-700/70 hover:border-sky-500/60 hover:text-sky-300"
+                      }`}
                     >
-                      Report
-                    </Button>
-                    <Button type="button" onClick={() => answerQuestion(item.id)}>
-                      Answer and publish
-                    </Button>
-                  </div>
-                </div>
-              )}
+                      {option.optionText}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button variant="ghost" type="button" onClick={() => reportItem(item)}>
+                  Report
+                </Button>
+                {!poll.isPublished && (
+                  <Button type="button" onClick={() => publishPoll(item.id)}>
+                    Publish poll
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </Card>
-      );
-    }
-    const poll = item.data as Poll;
-    const isSelected = selectedIds.has(item.id);
-    const questionText = poll.questionText;
-    return (
-      <Card key={item.id} className="p-4 space-y-3">
-        <div className="flex items-start gap-2">
-          <input
-            type="checkbox"
-            className="mt-1 h-4 w-4 rounded border-slate-700 bg-slate-900"
-            checked={isSelected}
-            onChange={() => toggleSelect(item.id)}
-          />
-          <div className="flex-1 space-y-2">
-            <p className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
-              {questionText ?? "Poll"}
-            </p>
-            <div className="space-y-1 text-xs text-slate-600 dark:text-slate-400">
-              {poll.options.map((option, index) => {
-                const selectedIndex = pollSelections[item.id] ?? null;
-                const isSelectedOption = selectedIndex === index;
-                return (
-                  <button
-                    key={option.optionText}
-                    type="button"
-                    onClick={() =>
-                      setPollSelections(previous => ({
-                        ...previous,
-                        [item.id]: index
-                      }))
-                    }
-                    className={`w-full text-left rounded-full px-3 py-1 transition ${
-                      isSelectedOption
-                        ? "bg-sky-500/10 text-sky-400"
-                        : "bg-transparent hover:bg-slate-800/40"
-                    }`}
-                  >
-                    {option.optionText}
-                  </button>
-                );
-              })}
-            </div>
-            <div className="flex gap-2 justify-end">
-              <Button variant="ghost" type="button" onClick={() => reportItem(item)}>
-                Report
-              </Button>
-              {!poll.isPublished && (
-                <Button type="button" onClick={() => publishPoll(item.id)}>
-                  Publish poll
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      </Card>
+      </motion.div>
     );
   };
 
@@ -481,7 +498,9 @@ export default function InboxPage() {
     if (key === "new") {
       if (grouped.newItems.length === 0) {
         return (
-          <p className="text-sm text-slate-500 dark:text-slate-500">Nothing new yet.</p>
+          <Card className="p-4 text-sm text-slate-300 border border-dashed border-slate-700/70 bg-slate-900/40 flex items-center justify-center">
+            Nothing new yet.
+          </Card>
         );
       }
       return <div className="space-y-3">{grouped.newItems.map(renderItem)}</div>;
@@ -489,16 +508,18 @@ export default function InboxPage() {
     if (key === "answered") {
       if (grouped.answered.length === 0) {
         return (
-          <p className="text-sm text-slate-500 dark:text-slate-500">
+          <Card className="p-4 text-sm text-slate-300 border border-dashed border-slate-700/70 bg-slate-900/40 flex items-center justify-center">
             No answered items yet.
-          </p>
+          </Card>
         );
       }
       return <div className="space-y-3">{grouped.answered.map(renderItem)}</div>;
     }
     if (grouped.reported.length === 0) {
       return (
-        <p className="text-sm text-slate-500 dark:text-slate-500">No reported items.</p>
+        <Card className="p-4 text-sm text-slate-300 border border-dashed border-slate-700/70 bg-slate-900/40 flex items-center justify-center">
+          No reported items.
+        </Card>
       );
     }
     return <div className="space-y-3">{grouped.reported.map(renderItem)}</div>;
@@ -520,7 +541,7 @@ export default function InboxPage() {
   }
 
   return (
-    <main className="min-h-screen px-4 py-8 flex justify-center">
+    <main className="min-h-screen px-4 py-8 flex justify-center bg-gradient-to-b from-slate-950 via-slate-950 to-black">
       <Modal
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
@@ -549,22 +570,54 @@ export default function InboxPage() {
           </Button>
         </div>
       </Modal>
-      <div className="w-full max-w-3xl space-y-6">
+      <div className="w-full max-w-3xl space-y-6 rounded-2xl border border-slate-800/70 bg-slate-950/60 px-5 py-6 shadow-[0_18px_45px_rgba(15,23,42,0.85)] backdrop-blur">
         <header className="flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold">Smart inbox</h1>
-            <p className="text-xs text-slate-600 dark:text-slate-500">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-sky-400/80 mb-1">
+              Inbox
+            </p>
+            <h1 className="text-2xl font-semibold bg-gradient-to-r from-sky-400 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+              Smart inbox
+            </h1>
+            <p className="mt-1 text-xs text-slate-400">
               Manage your anonymous questions and polls in one place.
             </p>
           </div>
         </header>
 
+        <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <Card className="p-3 border border-sky-500/40 bg-sky-500/10">
+            <p className="text-[11px] uppercase tracking-wide text-sky-200">
+              New
+            </p>
+            <p className="mt-1 text-lg font-semibold text-sky-50">
+              {grouped.newItems.length}
+            </p>
+          </Card>
+          <Card className="p-3 border border-violet-500/40 bg-violet-500/10">
+            <p className="text-[11px] uppercase tracking-wide text-violet-200">
+              Answered
+            </p>
+            <p className="mt-1 text-lg font-semibold text-violet-50">
+              {grouped.answered.length}
+            </p>
+          </Card>
+          <Card className="p-3 border border-rose-500/40 bg-rose-500/10">
+            <p className="text-[11px] uppercase tracking-wide text-rose-200">
+              Reported
+            </p>
+            <p className="mt-1 text-lg font-semibold text-rose-50">
+              {grouped.reported.length}
+            </p>
+          </Card>
+        </section>
+
         <section className="grid gap-4 md:grid-cols-2">
-          <Card className="p-4 space-y-2">
-            <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+          <Card className="p-4 space-y-2 border border-slate-800/70 bg-slate-900/60">
+            <h2 className="text-sm font-semibold text-slate-100">
               Public bio
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-500">
+            <p className="text-xs text-slate-400">
               Shown on your public profile. Max 160 characters.
             </p>
             <Textarea
@@ -574,11 +627,11 @@ export default function InboxPage() {
               maxLength={160}
             />
           </Card>
-          <Card className="p-4 space-y-2">
-            <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+          <Card className="p-4 space-y-2 border border-slate-800/70 bg-slate-900/60">
+            <h2 className="text-sm font-semibold text-slate-100">
               Avatar image URL
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-500">
+            <p className="text-xs text-slate-400">
               Optional image URL used for your profile avatar.
             </p>
             <Input
@@ -596,46 +649,50 @@ export default function InboxPage() {
         </section>
 
         {shareUrl && (
-          <section className="flex items-center justify-between gap-4">
-            <div className="text-xs text-slate-500">
-              Share this link so people can send you anonymous messages:
-              <p className="mt-1 text-slate-700 dark:text-slate-300 break-all">
-                {shareUrl}
-              </p>
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(shareUrl);
-                } catch {}
-              }}
-            >
-              Copy link
-            </Button>
+          <section>
+            <Card className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 border border-slate-800/70 bg-slate-900/60">
+              <div className="text-xs text-slate-400">
+                Share this link so people can send you anonymous messages:
+                <p className="mt-1 text-slate-100 break-all">
+                  {shareUrl}
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(shareUrl);
+                  } catch {}
+                }}
+              >
+                Copy link
+              </Button>
+            </Card>
           </section>
         )}
 
-        <section className="flex items-center justify-between gap-4">
-          <Input
-            placeholder="Search by keyword"
-            value={search}
-            onChange={event => setSearch(event.target.value)}
-          />
-          {selectedIds.size > 0 && (
-            <div className="flex items-center gap-2 text-xs">
-              <span className="text-slate-600 dark:text-slate-400">
-                {selectedIds.size} selected
-              </span>
-              <Button variant="ghost" type="button" onClick={clearSelection}>
-                Clear
-              </Button>
-              <Button variant="outline" type="button" onClick={bulkDelete}>
-                Delete
-              </Button>
-            </div>
-          )}
+        <section>
+          <Card className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 p-3 border border-slate-800/70 bg-slate-900/60">
+            <Input
+              placeholder="Search by keyword"
+              value={search}
+              onChange={event => setSearch(event.target.value)}
+            />
+            {selectedIds.size > 0 && (
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-slate-300">
+                  {selectedIds.size} selected
+                </span>
+                <Button variant="ghost" type="button" onClick={clearSelection}>
+                  Clear
+                </Button>
+                <Button variant="outline" type="button" onClick={bulkDelete}>
+                  Delete
+                </Button>
+              </div>
+            )}
+          </Card>
         </section>
 
         <Tabs
