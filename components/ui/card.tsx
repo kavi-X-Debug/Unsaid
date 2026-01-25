@@ -21,10 +21,17 @@ export function Card(props: Props) {
 
   useEffect(() => {
     if (prefersReducedMotion) {
-      controls.set({ scale: 1, boxShadow: "0 0 0 rgba(0,0,0,0)" });
+      controls.set({
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        boxShadow: "0 0 0 rgba(0,0,0,0)"
+      });
       return;
     }
     controls.start({
+      opacity: 1,
+      y: 0,
       scale: [1, 1.02, 1],
       boxShadow: [
         "0 0 0 rgba(56,189,248,0)",
