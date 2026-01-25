@@ -118,9 +118,19 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4">
+    <main className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-slate-950 via-slate-950 to-black">
       <div className="max-w-md w-full space-y-6">
-        <h1 className="text-3xl font-semibold tracking-tight text-center">Welcome back</h1>
+        <div className="text-center space-y-1">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-sky-400/80">
+            Log in
+          </p>
+          <h1 className="text-3xl font-semibold tracking-tight bg-gradient-to-r from-sky-400 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+            Welcome back
+          </h1>
+          <p className="text-xs text-slate-400">
+            Continue to your smart inbox to see new questions and polls.
+          </p>
+        </div>
         <Card className="p-6 space-y-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1 text-left">

@@ -139,11 +139,19 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4">
+    <main className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-slate-950 via-slate-950 to-black">
       <div className="max-w-md w-full space-y-6">
-        <h1 className="text-3xl font-semibold tracking-tight text-center">
-          Create your Unsaid profile
-        </h1>
+        <div className="text-center space-y-1">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-emerald-400/80">
+            Sign up
+          </p>
+          <h1 className="text-3xl font-semibold tracking-tight bg-gradient-to-r from-emerald-400 via-sky-400 to-violet-400 bg-clip-text text-transparent">
+            Create your Unsaid profile
+          </h1>
+          <p className="text-xs text-slate-400">
+            Start receiving anonymous questions and polls with your own profile link.
+          </p>
+        </div>
         <Card className="p-6 space-y-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1 text-left">
