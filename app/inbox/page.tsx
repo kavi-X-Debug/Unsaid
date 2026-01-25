@@ -248,15 +248,7 @@ export default function InboxPage() {
       const poll = item.data as Poll;
       return poll.isPublished && !poll.isReported;
     });
-    const reported = newest.filter(item => {
-      if (item.type === "question") {
-        const question = item.data as Question;
-        return question.isReported;
-      }
-      const poll = item.data as Poll;
-      return poll.isReported;
-    });
-    return { newItems, answered, reported };
+    return { newItems, answered };
   }, [filtered]);
 
   const toggleSelect = (id: string) => {
@@ -474,14 +466,7 @@ export default function InboxPage() {
       }
       return <div className="space-y-3">{grouped.answered.map(renderItem)}</div>;
     }
-    if (grouped.reported.length === 0) {
-      return (
-        <Card className="p-4 text-sm text-slate-300 border border-dashed border-slate-700/70 bg-slate-900/40 flex items-center justify-center">
-          No reported items.
-        </Card>
-      );
-    }
-    return <div className="space-y-3">{grouped.reported.map(renderItem)}</div>;
+    return null;
   };
 
   if (!user && loading) {
@@ -544,7 +529,7 @@ export default function InboxPage() {
           </div>
         </header>
 
-        <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <section className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Card className="p-3 border border-sky-500/40 bg-sky-500/10">
             <p className="text-[11px] uppercase tracking-wide text-sky-200">
               New
@@ -559,14 +544,6 @@ export default function InboxPage() {
             </p>
             <p className="mt-1 text-lg font-semibold text-violet-50">
               {grouped.answered.length}
-            </p>
-          </Card>
-          <Card className="p-3 border border-rose-500/40 bg-rose-500/10">
-            <p className="text-[11px] uppercase tracking-wide text-rose-200">
-              Reported
-            </p>
-            <p className="mt-1 text-lg font-semibold text-rose-50">
-              {grouped.reported.length}
             </p>
           </Card>
         </section>
@@ -621,26 +598,11 @@ export default function InboxPage() {
         <Tabs
           tabs={[
             { key: "new", label: "New" },
-            { key: "answered", label: "Answered" },
-            { key: "reported", label: "Reported" }
+            { key: "answered", label: "Answered" }
           ]}
           initialKey="new"
           renderContent={renderTabContent}
         />
-        <section className="flex justify-end pt-4 pb-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={async () => {
-              const { signOut } = await import("firebase/auth");
-              const { auth } = await import("../../lib/firebase");
-              await signOut(auth);
-              router.push("/");
-            }}
-          >
-            Log out
-          </Button>
-        </section>
       </div>
     </main>
   );

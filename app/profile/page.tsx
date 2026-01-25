@@ -21,6 +21,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Modal } from "@/components/ui/modal";
 import Avatar1 from "../../Images/Gemini_Generated_Image_1uzn0a1uzn0a1uzn (1).png";
 import Avatar2 from "../../Images/Gemini_Generated_Image_4mkak64mkak64mka (1).png";
 import Avatar3 from "../../Images/Gemini_Generated_Image_avzbkdavzbkdavzb (1).png";
@@ -48,10 +49,11 @@ export default function ProfilePage() {
   const [initializing, setInitializing] = useState(true);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [passwordSaving, setPasswordSaving] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [passwordMessage, setPasswordMessage] = useState<string | null>(null);
+  const [isEditingPassword, setIsEditingPassword] = useState(false);
+  const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
 
   useEffect(() => {
     if (loading) {
@@ -157,7 +159,7 @@ export default function ProfilePage() {
   }, [bioDraft]);
 
   const [isEditingBio, setIsEditingBio] = useState(false);
-
+  const [isEditingAvatar, setIsEditingAvatar] = useState(false);
   const [avatarSaving, setAvatarSaving] = useState(false);
 
   const handleSave = async () => {
@@ -223,16 +225,12 @@ export default function ProfilePage() {
       setPasswordError("Password change is not available for this account.");
       return;
     }
-    if (!currentPassword || !newPassword || !confirmNewPassword) {
-      setPasswordError("Fill in all password fields.");
+    if (!currentPassword || !newPassword) {
+      setPasswordError("Fill in both password fields.");
       return;
     }
     if (newPassword.length < 6) {
       setPasswordError("New password must be at least 6 characters.");
-      return;
-    }
-    if (newPassword !== confirmNewPassword) {
-      setPasswordError("New passwords do not match.");
       return;
     }
     setPasswordSaving(true);
@@ -240,10 +238,10 @@ export default function ProfilePage() {
       const credential = EmailAuthProvider.credential(user.email, currentPassword);
       await reauthenticateWithCredential(user, credential);
       await updatePassword(user, newPassword);
-      setPasswordMessage("Password updated successfully.");
+      setPasswordMessage("Password Changed Successfully");
       setCurrentPassword("");
       setNewPassword("");
-      setConfirmNewPassword("");
+      setIsEditingPassword(false);
     } catch {
       setPasswordError("Could not update password. Check your current password and try again.");
     } finally {
@@ -265,6 +263,37 @@ export default function ProfilePage() {
 
   return (
     <main className="min-h-screen px-4 py-10 flex justify-center">
+      <Modal
+        open={confirmLogoutOpen}
+        onClose={() => setConfirmLogoutOpen(false)}
+        title="Log out?"
+      >
+        <p className="text-xs text-slate-700 dark:text-slate-300">
+          Are you sure you want to log out of your account?
+        </p>
+        <div className="mt-4 flex justify-end gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setConfirmLogoutOpen(false)}
+          >
+            No
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={async () => {
+              const { signOut } = await import("firebase/auth");
+              const { auth } = await import("../../lib/firebase");
+              await signOut(auth);
+              setConfirmLogoutOpen(false);
+              router.push("/");
+            }}
+          >
+            Yes
+          </Button>
+        </div>
+      </Modal>
       <div className="w-full max-w-2xl space-y-6">
         <header className="space-y-1">
           <h1 className="text-2xl font-semibold">Account settings</h1>
@@ -362,41 +391,71 @@ export default function ProfilePage() {
           <p className="text-xs text-slate-500 dark:text-slate-500">
             Choose an image to use as your profile picture.
           </p>
-          <div className="grid grid-cols-4 gap-3">
-            {avatarOptions.map((image, index) => {
-              const isSelected = avatarDraft === image.src;
-              return (
-                <button
-                  key={index}
+          {!isEditingAvatar ? (
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setIsEditingAvatar(true);
+                }}
+              >
+                Change the Profile Image
+              </Button>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-4 gap-3">
+                {avatarOptions.map((image, index) => {
+                  const isSelected = avatarDraft === image.src;
+                  return (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => setAvatarDraft(image.src)}
+                      className={`relative flex items-center justify-center rounded-full border p-0.5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 ${
+                        isSelected
+                          ? "border-sky-500 ring-1 ring-sky-400"
+                          : "border-slate-300 hover:border-slate-400 dark:border-slate-700 dark:hover:border-slate-500"
+                      }`}
+                    >
+                      <Image
+                        src={image}
+                        alt="Profile choice"
+                        width={56}
+                        height={56}
+                        className="h-14 w-14 rounded-full object-cover"
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button
                   type="button"
-                  onClick={() => setAvatarDraft(image.src)}
-                  className={`relative flex items-center justify-center rounded-full border p-0.5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 ${
-                    isSelected
-                      ? "border-sky-500 ring-1 ring-sky-400"
-                      : "border-slate-300 hover:border-slate-400 dark:border-slate-700 dark:hover:border-slate-500"
-                  }`}
+                  variant="ghost"
+                  onClick={() => {
+                    setAvatarDraft(avatarUrl);
+                    setIsEditingAvatar(false);
+                  }}
+                  disabled={avatarSaving}
                 >
-                  <Image
-                    src={image}
-                    alt="Profile choice"
-                    width={56}
-                    height={56}
-                    className="h-14 w-14 rounded-full object-cover"
-                  />
-                </button>
-              );
-            })}
-          </div>
-          <div className="flex justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleSaveAvatar}
-              disabled={avatarSaving || avatarDraft === avatarUrl}
-            >
-              {avatarSaving ? "Saving..." : "Save profile image"}
-            </Button>
-          </div>
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={async () => {
+                    await handleSaveAvatar();
+                    setIsEditingAvatar(false);
+                  }}
+                  disabled={avatarSaving || avatarDraft === avatarUrl}
+                >
+                  {avatarSaving ? "Saving..." : "Save the Profile image"}
+                </Button>
+              </div>
+            </>
+          )}
         </Card>
 
         <Card className="p-4 space-y-4">
@@ -405,61 +464,86 @@ export default function ProfilePage() {
           </h2>
           {canChangePassword ? (
             <>
-              <div className="space-y-1 text-left">
-                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                  Current password
-                </label>
-                <Input
-                  type="password"
-                  autoComplete="current-password"
-                  value={currentPassword}
-                  onChange={event => setCurrentPassword(event.target.value)}
-                  minLength={6}
-                  required
-                />
-              </div>
-              <div className="space-y-1 text-left">
-                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                  New password
-                </label>
-                <Input
-                  type="password"
-                  autoComplete="new-password"
-                  value={newPassword}
-                  onChange={event => setNewPassword(event.target.value)}
-                  minLength={6}
-                  required
-                />
-              </div>
-              <div className="space-y-1 text-left">
-                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                  Confirm new password
-                </label>
-                <Input
-                  type="password"
-                  autoComplete="new-password"
-                  value={confirmNewPassword}
-                  onChange={event => setConfirmNewPassword(event.target.value)}
-                  minLength={6}
-                  required
-                />
-              </div>
-              {passwordError && (
-                <p className="text-xs text-rose-400">{passwordError}</p>
+              {!isEditingPassword ? (
+                <div className="space-y-3 text-left">
+                  <p className="text-xs text-slate-600 dark:text-slate-400">
+                    For your security, we need your current password before you set a new one.
+                  </p>
+                  <div className="flex justify-end">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setPasswordError(null);
+                        setPasswordMessage(null);
+                        setCurrentPassword("");
+                        setNewPassword("");
+                        setIsEditingPassword(true);
+                      }}
+                    >
+                      Change password
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-1 text-left">
+                    <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                      Current password
+                    </label>
+                    <Input
+                      type="password"
+                      autoComplete="current-password"
+                      value={currentPassword}
+                      onChange={event => setCurrentPassword(event.target.value)}
+                      minLength={6}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-1 text-left">
+                    <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                      New password
+                    </label>
+                    <Input
+                      type="password"
+                      autoComplete="new-password"
+                      value={newPassword}
+                      onChange={event => setNewPassword(event.target.value)}
+                      minLength={6}
+                      required
+                    />
+                  </div>
+                  {passwordError && (
+                    <p className="text-xs text-rose-400">{passwordError}</p>
+                  )}
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => {
+                        setIsEditingPassword(false);
+                        setCurrentPassword("");
+                        setNewPassword("");
+                        setPasswordError(null);
+                      }}
+                      disabled={passwordSaving}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleChangePassword}
+                      disabled={passwordSaving}
+                    >
+                      {passwordSaving ? "Updating..." : "Save new password"}
+                    </Button>
+                  </div>
+                </>
               )}
               {passwordMessage && (
                 <p className="text-xs text-emerald-400">{passwordMessage}</p>
               )}
-              <div className="flex justify-end">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleChangePassword}
-                  disabled={passwordSaving}
-                >
-                  {passwordSaving ? "Updating..." : "Update password"}
-                </Button>
-              </div>
             </>
           ) : (
             <p className="text-xs text-slate-500 dark:text-slate-500">
@@ -468,7 +552,23 @@ export default function ProfilePage() {
             </p>
           )}
         </Card>
+        <section className="flex justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setConfirmLogoutOpen(true)}
+          >
+            Log out
+          </Button>
+        </section>
       </div>
+      {copied && (
+        <div className="fixed inset-x-0 bottom-6 flex justify-center z-50 pointer-events-none">
+          <div className="rounded-full bg-slate-900/95 text-slate-50 px-4 py-2 text-xs shadow-lg shadow-sky-500/30 border border-slate-700">
+            Link copied
+          </div>
+        </div>
+      )}
     </main>
   );
 }

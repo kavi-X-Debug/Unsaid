@@ -2,16 +2,64 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { useAuth } from "../auth/auth-provider";
+import { db } from "../../lib/firebase";
 import logo from "../../icon.jpg";
 
 export function Navbar() {
   const pathname = usePathname();
   const { user } = useAuth();
+  const [inboxCount, setInboxCount] = useState(0);
+
+  useEffect(() => {
+    if (!user?.uid) {
+      setInboxCount(0);
+      return;
+    }
+    const qQuery = query(
+      collection(db, "questions"),
+      where("toUserId", "==", user.uid),
+      where("isAnswered", "==", false),
+      where("isReported", "==", false)
+    );
+    const pQuery = query(
+      collection(db, "polls"),
+      where("toUserId", "==", user.uid),
+      where("isPublished", "==", false),
+      where("isReported", "==", false)
+    );
+    const unsubQuestions = onSnapshot(qQuery, snapshot => {
+      setInboxCount(previous => {
+        const pollsOnly = previous & 0xffff;
+        const questionsCount = snapshot.size;
+        return (questionsCount << 16) | pollsOnly;
+      });
+    });
+    const unsubPolls = onSnapshot(pQuery, snapshot => {
+      setInboxCount(previous => {
+        const questionsOnly = previous >> 16;
+        const pollsCount = snapshot.size;
+        return (questionsOnly << 16) | pollsCount;
+      });
+    });
+    return () => {
+      unsubQuestions();
+      unsubPolls();
+    };
+  }, [user?.uid]);
+
+  const totalInboxCount = useMemo(() => {
+    const questionsCount = inboxCount >> 16;
+    const pollsCount = inboxCount & 0xffff;
+    return questionsCount + pollsCount;
+  }, [inboxCount]);
+
   const links = [
     { href: "/", label: "Home" },
-    ...(user ? [{ href: "/inbox", label: "Inbox" }] : []),
+    ...(user ? [{ href: "/inbox", label: "Inbox" as const }] : []),
     { href: "/profile", label: "Profile" }
   ];
 
@@ -40,7 +88,14 @@ export function Navbar() {
                     : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-50"
                 }`}
               >
-                {link.label}
+                <span className="inline-flex items-center gap-1">
+                  <span>{link.label}</span>
+                  {link.href === "/inbox" && totalInboxCount > 0 && (
+                    <span className="ml-1 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-sky-500 px-1 text-[10px] font-semibold text-white">
+                      {totalInboxCount > 99 ? "99+" : totalInboxCount}
+                    </span>
+                  )}
+                </span>
               </Link>
             );
           })}
