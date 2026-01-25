@@ -8,6 +8,7 @@ import { auth } from "../../lib/firebase";
 type AuthContextValue = {
   user: User | null;
   loading: boolean;
+  isVerified: boolean;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -28,7 +29,13 @@ export function AuthProvider(props: Props) {
     return () => unsub();
   }, []);
 
-  return <AuthContext.Provider value={{ user, loading }}>{props.children}</AuthContext.Provider>;
+  const isVerified = !!user?.emailVerified;
+
+  return (
+    <AuthContext.Provider value={{ user, loading, isVerified }}>
+      {props.children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

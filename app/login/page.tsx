@@ -4,7 +4,12 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { User } from "firebase/auth";
-import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  sendEmailVerification,
+  signInWithEmailAndPassword,
+  signInWithPopup
+} from "firebase/auth";
 import {
   collection,
   doc,
@@ -27,6 +32,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [loadingGoogle, setLoadingGoogle] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
 
   const ensureUserProfile = async (user: User) => {
     const ref = doc(db, "users", user.uid);
@@ -67,9 +73,17 @@ export default function LoginPage() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setError(null);
+    setMessage(null);
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const credential = await signInWithEmailAndPassword(auth, email, password);
+      if (!credential.user.emailVerified) {
+        await sendEmailVerification(credential.user);
+        setError("Please verify your email before logging in.");
+        setMessage("We sent a verification link to your email. Please check your inbox.");
+        return;
+      }
+      await ensureUserProfile(credential.user);
       router.push("/inbox");
     } catch (err) {
       setError("Could not sign in. Check your email and password.");
@@ -80,11 +94,18 @@ export default function LoginPage() {
 
   const handleGoogle = async () => {
     setError(null);
+    setMessage(null);
     setLoadingGoogle(true);
     try {
       const provider = new GoogleAuthProvider();
       const credential = await signInWithPopup(auth, provider);
       if (credential.user) {
+        if (!credential.user.emailVerified) {
+          await sendEmailVerification(credential.user);
+          setError("Please verify your email before logging in.");
+          setMessage("We sent a verification link to your email. Please check your inbox.");
+          return;
+        }
         await ensureUserProfile(credential.user);
       }
     } catch (err) {
@@ -127,6 +148,7 @@ export default function LoginPage() {
               />
             </div>
             {error && <p className="text-sm text-rose-400">{error}</p>}
+            {message && <p className="text-sm text-emerald-400">{message}</p>}
             <Button type="submit" fullWidth disabled={loading}>
               {loading ? "Signing in..." : "Log in"}
             </Button>

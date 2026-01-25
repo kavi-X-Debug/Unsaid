@@ -1,7 +1,16 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { collection, deleteDoc, doc, getDoc, onSnapshot, query, updateDoc, where } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  onSnapshot,
+  query,
+  updateDoc,
+  where
+} from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { db } from "../../lib/firebase";
 import { useAuth } from "../../components/auth/auth-provider";
@@ -22,7 +31,7 @@ type InboxItem = {
 };
 
 export default function InboxPage() {
-  const { user, loading } = useAuth();
+  const { user, loading, isVerified } = useAuth();
   const router = useRouter();
   const [items, setItems] = useState<InboxItem[]>([]);
   const [answerDrafts, setAnswerDrafts] = useState<Record<string, string>>({});
@@ -32,10 +41,17 @@ export default function InboxPage() {
   const [shareUrl, setShareUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login");
+    if (loading) {
+      return;
     }
-  }, [user, loading, router]);
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    if (!isVerified) {
+      router.push("/verify-email");
+    }
+  }, [user, loading, isVerified, router]);
 
   useEffect(() => {
     if (!user?.uid) {

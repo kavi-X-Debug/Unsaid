@@ -5,7 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FirebaseError } from "firebase/app";
 import type { User } from "firebase/auth";
-import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  signInWithPopup
+} from "firebase/auth";
 import {
   collection,
   doc,
@@ -29,6 +34,7 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [loadingGoogle, setLoadingGoogle] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
 
   const ensureUserProfile = async (user: User) => {
     const ref = doc(db, "users", user.uid);
@@ -69,6 +75,7 @@ export default function SignupPage() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setError(null);
+    setMessage(null);
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
@@ -77,8 +84,14 @@ export default function SignupPage() {
     try {
       const credential = await createUserWithEmailAndPassword(auth, email, password);
       if (credential.user) {
-        await ensureUserProfile(credential.user);
-        router.push("/inbox");
+        if (credential.user.emailVerified) {
+          await ensureUserProfile(credential.user);
+          router.push("/inbox");
+          return;
+        }
+        await sendEmailVerification(credential.user);
+        setMessage("We sent a verification link to your email. Please check your inbox.");
+        router.push("/verify-email");
       }
     } catch (err) {
       console.error(err);
@@ -102,11 +115,18 @@ export default function SignupPage() {
 
   const handleGoogle = async () => {
     setError(null);
+    setMessage(null);
     setLoadingGoogle(true);
     try {
       const provider = new GoogleAuthProvider();
       const credential = await signInWithPopup(auth, provider);
       if (credential.user) {
+        if (!credential.user.emailVerified) {
+          await sendEmailVerification(credential.user);
+          setMessage("We sent a verification link to your email. Please check your inbox.");
+          router.push("/verify-email");
+          return;
+        }
         await ensureUserProfile(credential.user);
         router.push("/inbox");
       }
@@ -155,16 +175,17 @@ export default function SignupPage() {
               <label className="text-sm font-medium text-slate-800 dark:text-slate-200">
                 Confirm password
               </label>
-              <Input
-                type="password"
-                autoComplete="new-password"
-                value={confirmPassword}
-                onChange={event => setConfirmPassword(event.target.value)}
-                required
-                minLength={6}
-              />
-            </div>
+          <Input
+            type="password"
+            autoComplete="new-password"
+            value={confirmPassword}
+            onChange={event => setConfirmPassword(event.target.value)}
+            required
+            minLength={6}
+          />
+        </div>
             {error && <p className="text-sm text-rose-400">{error}</p>}
+            {message && <p className="text-sm text-emerald-400">{message}</p>}
             <Button type="submit" fullWidth disabled={loading}>
               {loading ? "Creating account..." : "Sign up"}
             </Button>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ProfilePageClient } from "./profile-client";
-import { db } from "../../lib/firebase";
-import type { AppUser, Question, Poll } from "../../lib/types";
+import { db } from "@/lib/firebase";
+import type { AppUser, Question, Poll } from "@/lib/types";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
 type Props = {
