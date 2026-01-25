@@ -5,10 +5,10 @@ export default function LandingPage() {
     <main className="min-h-screen flex flex-col bg-gradient-to-b from-slate-950 via-slate-950 to-black">
       <div className="flex-1 flex flex-col items-center justify-center px-4">
         <div className="max-w-xl w-full space-y-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-slate-50">
             Anonymous questions, polls, and reactions for real connections
           </h1>
-          <p className="text-slate-600 dark:text-slate-300">
+          <p className="text-slate-300">
             Unsaid lets anyone send you anonymous messages and polls while you stay in
             control with a smart inbox, reactions, and safety tools.
           </p>
@@ -26,7 +26,7 @@ export default function LandingPage() {
               Log in
             </Link>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-slate-400">
             Built with Next.js, Firebase, and Tailwind. Optimized for Vercel.
           </p>
         </div>

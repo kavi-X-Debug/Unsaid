@@ -26,6 +26,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const [username, setUsername] = useState<string | null>(null);
   const [bioDraft, setBioDraft] = useState("");
+  const [savedBio, setSavedBio] = useState("");
   const [joinedText, setJoinedText] = useState<string | null>(null);
   const [viewCount, setViewCount] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
@@ -59,7 +60,9 @@ export default function ProfilePage() {
           profileViews?: number;
         };
         nextUsername = data.username ?? null;
-        setBioDraft(data.bio ?? "");
+        const initialBio = (data.bio as string | null) ?? "";
+        setBioDraft(initialBio);
+        setSavedBio(initialBio);
         if (typeof data.profileViews === "number") {
           setViewCount(data.profileViews);
         } else {
@@ -100,6 +103,8 @@ export default function ProfilePage() {
           }
         });
         nextUsername = candidate;
+        setBioDraft("");
+        setSavedBio("");
       }
       setUsername(nextUsername);
       const origin =
@@ -121,6 +126,19 @@ export default function ProfilePage() {
     return `@${username}`;
   }, [username]);
 
+  const displayBio = useMemo(() => {
+    const trimmed = bioDraft.trim();
+    if (!trimmed) {
+      return "";
+    }
+    if (trimmed.length <= 160) {
+      return trimmed;
+    }
+    return trimmed.slice(0, 160);
+  }, [bioDraft]);
+
+  const [isEditingBio, setIsEditingBio] = useState(false);
+
   const handleSave = async () => {
     if (!user?.uid) {
       return;
@@ -132,6 +150,9 @@ export default function ProfilePage() {
       await updateDoc(ref, {
         bio: trimmedBio || null
       });
+      setSavedBio(trimmedBio);
+      setBioDraft(trimmedBio);
+      setIsEditingBio(false);
     } finally {
       setSaving(false);
     }
@@ -252,17 +273,48 @@ export default function ProfilePage() {
             <p className="text-xs text-slate-500 dark:text-slate-500">
               Short bio shown on your public profile. Max 160 characters.
             </p>
-            <Textarea
-              rows={3}
-              value={bioDraft}
-              onChange={event => setBioDraft(event.target.value)}
-              maxLength={160}
-            />
-          </div>
-          <div className="flex justify-end">
-            <Button type="button" variant="outline" onClick={handleSave} disabled={saving}>
-              {saving ? "Saving..." : "Save changes"}
-            </Button>
+            {!isEditingBio ? (
+              <>
+                <div className="min-h-[52px] rounded-md border border-dashed border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-200">
+                  {displayBio || "No bio yet. Click Change bio to add one."}
+                </div>
+                <div className="flex justify-end">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsEditingBio(true)}
+                    disabled={saving}
+                  >
+                    Change bio
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <Textarea
+                  rows={3}
+                  value={bioDraft}
+                  onChange={event => setBioDraft(event.target.value)}
+                  maxLength={160}
+                />
+                <div className="flex justify-end gap-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => {
+                      setBioDraft(savedBio);
+                      setIsEditingBio(false);
+                    }}
+                    disabled={saving}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="button" variant="outline" onClick={handleSave} disabled={saving}>
+                    {saving ? "Saving..." : "Save bio"}
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </Card>
 
