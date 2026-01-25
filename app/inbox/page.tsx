@@ -6,8 +6,11 @@ import {
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
   onSnapshot,
   query,
+  serverTimestamp,
+  setDoc,
   updateDoc,
   where
 } from "firebase/firestore";
@@ -103,21 +106,49 @@ export default function InboxPage() {
       try {
         const ref = doc(db, "users", user.uid);
         const snap = await getDoc(ref);
-        if (!snap.exists()) {
-          return;
-        }
-        const data = snap.data() as { username?: string };
-        if (!data.username) {
-          return;
+        let username: string | null = null;
+        if (snap.exists()) {
+          const data = snap.data() as { username?: string };
+          username = data.username ?? null;
+        } else {
+          const emailLocal = user.email ? user.email.split("@")[0] : "";
+          const namePart = user.displayName ? user.displayName.split(" ")[0] : "";
+          const rawBase = (emailLocal || namePart || user.uid.slice(0, 8)).toLowerCase();
+          let base = rawBase.replace(/[^a-z0-9_]/g, "");
+          if (!base) {
+            base = `user_${user.uid.slice(0, 6)}`;
+          }
+          let candidate = base;
+          let suffix = 0;
+          for (;;) {
+            const existing = await getDocs(
+              query(collection(db, "users"), where("username", "==", candidate))
+            );
+            if (existing.empty) {
+              break;
+            }
+            suffix += 1;
+            candidate = `${base}${suffix}`;
+          }
+          await setDoc(ref, {
+            uid: user.uid,
+            username: candidate,
+            bio: null,
+            createdAt: serverTimestamp(),
+            settings: {
+              positiveOnlyMode: false
+            }
+          });
+          username = candidate;
         }
         const origin =
           typeof window !== "undefined" && window.location.origin
             ? window.location.origin
             : "";
-        if (!origin) {
+        if (!origin || !username) {
           return;
         }
-        setShareUrl(`${origin}/u/${data.username.toLowerCase()}`);
+        setShareUrl(`${origin}/u/${username.toLowerCase()}`);
       } catch {
         setShareUrl(null);
       }
