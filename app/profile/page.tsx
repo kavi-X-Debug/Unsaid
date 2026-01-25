@@ -161,6 +161,7 @@ export default function ProfilePage() {
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [isEditingAvatar, setIsEditingAvatar] = useState(false);
   const [avatarSaving, setAvatarSaving] = useState(false);
+  const [avatarMessage, setAvatarMessage] = useState<string | null>(null);
 
   const handleSave = async () => {
     if (!user?.uid) {
@@ -185,6 +186,7 @@ export default function ProfilePage() {
     if (!user?.uid) {
       return;
     }
+    setAvatarMessage(null);
     setAvatarSaving(true);
     try {
       const ref = doc(db, "users", user.uid);
@@ -192,6 +194,7 @@ export default function ProfilePage() {
         avatarUrl: avatarDraft ?? null
       });
       setAvatarUrl(avatarDraft ?? null);
+      setAvatarMessage("Profile Image Changed Successfully");
     } finally {
       setAvatarSaving(false);
     }
@@ -306,6 +309,20 @@ export default function ProfilePage() {
           <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
             Profile overview
           </h2>
+          {avatarUrl && (
+            <div className="flex items-center gap-3 pt-1">
+              <div className="h-10 w-10 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-700">
+                <Image
+                  src={avatarUrl}
+                  alt="Profile image"
+                  width={40}
+                  height={40}
+                  className="h-10 w-10 rounded-full object-cover"
+                />
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-400">Current profile image</p>
+            </div>
+          )}
           <p className="text-xs text-slate-600 dark:text-slate-400">
             Username:{" "}
             <span className="font-mono text-slate-800 dark:text-slate-200">{profileTitle}</span>
@@ -397,6 +414,7 @@ export default function ProfilePage() {
                 type="button"
                 variant="outline"
                 onClick={() => {
+                  setAvatarMessage(null);
                   setIsEditingAvatar(true);
                 }}
               >
@@ -455,6 +473,9 @@ export default function ProfilePage() {
                 </Button>
               </div>
             </>
+          )}
+          {avatarMessage && (
+            <p className="text-xs text-emerald-400">{avatarMessage}</p>
           )}
         </Card>
 
