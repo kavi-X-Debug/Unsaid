@@ -632,7 +632,7 @@ export default function InboxPage() {
                 Clear
               </Button>
               <Button variant="outline" type="button" onClick={bulkDelete}>
-                Bulk delete
+                Delete
               </Button>
             </div>
           )}
