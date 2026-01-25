@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import type { AppUser, Poll, Question } from "../../../lib/types";
 import { Card } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
@@ -10,6 +11,7 @@ import { Textarea } from "../../../components/ui/textarea";
 import { Input } from "../../../components/ui/input";
 import { ReactionBar } from "../../../components/questions/reaction-bar";
 import { StaggerContainer } from "../../../components/ui/motion";
+import { db } from "../../../lib/firebase";
 
 type PollDraftType = "yes_no" | "multiple_choice";
 
@@ -37,6 +39,8 @@ export function ProfilePageClient(props: Props) {
   const [error, setError] = useState<string | null>(null);
   const [pollVotes, setPollVotes] = useState<Record<string, number | null>>({});
   const [hasAsked, setHasAsked] = useState(false);
+  const [questions, setQuestions] = useState<Question[]>(props.questions);
+  const [polls, setPolls] = useState<Poll[]>(props.polls);
 
   const prefersReducedMotion = useReducedMotion();
   const duration = prefersReducedMotion ? 0 : 0.18;
@@ -113,6 +117,53 @@ export function ProfilePageClient(props: Props) {
     } catch {
     }
   }, [props.username]);
+
+  useEffect(() => {
+    const questionsQuery = query(
+      collection(db, "questions"),
+      where("toUserId", "==", props.user.uid)
+    );
+    const unsubscribeQuestions = onSnapshot(questionsQuery, snapshot => {
+      const answered: Question[] = [];
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data() as Omit<Question, "id">;
+        if (data.isAnswered && !data.isReported) {
+          answered.push({ id: docSnap.id, ...data });
+        }
+      });
+      answered.sort((a, b) => {
+        const aDate = a.createdAt?.toMillis?.() ?? 0;
+        const bDate = b.createdAt?.toMillis?.() ?? 0;
+        return bDate - aDate;
+      });
+      setQuestions(answered);
+    });
+
+    const pollsQuery = query(
+      collection(db, "polls"),
+      where("toUserId", "==", props.user.uid)
+    );
+    const unsubscribePolls = onSnapshot(pollsQuery, snapshot => {
+      const published: Poll[] = [];
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data() as Omit<Poll, "id">;
+        if (data.isPublished && !data.isReported) {
+          published.push({ id: docSnap.id, ...data });
+        }
+      });
+      published.sort((a, b) => {
+        const aDate = a.createdAt?.toMillis?.() ?? 0;
+        const bDate = b.createdAt?.toMillis?.() ?? 0;
+        return bDate - aDate;
+      });
+      setPolls(published);
+    });
+
+    return () => {
+      unsubscribeQuestions();
+      unsubscribePolls();
+    };
+  }, [props.user.uid]);
 
   const handleAsk = async () => {
     setError(null);
@@ -400,13 +451,13 @@ export function ProfilePageClient(props: Props) {
           <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
             Answered questions
           </h2>
-          {props.questions.length === 0 && (
+          {questions.length === 0 && (
             <p className="text-sm text-slate-600 dark:text-slate-500">
               No answered questions yet.
             </p>
           )}
           <StaggerContainer>
-            {props.questions.map(question => (
+            {questions.map(question => (
               <Card
                 key={question.id}
                 className="p-4 space-y-3 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow"
@@ -434,11 +485,11 @@ export function ProfilePageClient(props: Props) {
           <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
             Published polls
           </h2>
-          {props.polls.length === 0 && (
+          {polls.length === 0 && (
             <p className="text-sm text-slate-600 dark:text-slate-500">No polls yet.</p>
           )}
           <StaggerContainer>
-            {props.polls.map(poll => (
+            {polls.map(poll => (
               <Card
                 key={poll.id}
                 className="p-4 space-y-3 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow"
@@ -492,6 +543,13 @@ export function ProfilePageClient(props: Props) {
                     );
                   })}
                 </div>
+                {typeof poll.ownerSelection === "number" &&
+                  poll.ownerSelection >= 0 &&
+                  poll.ownerSelection < poll.options.length && (
+                    <p className="text-[11px] text-slate-600 dark:text-slate-500">
+                      Owner&apos;s choice: {poll.options[poll.ownerSelection].optionText}
+                    </p>
+                  )}
               </Card>
             ))}
           </StaggerContainer>

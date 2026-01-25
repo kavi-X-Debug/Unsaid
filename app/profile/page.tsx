@@ -128,6 +128,7 @@ export default function ProfilePage() {
         setAvatarDraft(null);
       }
       setUsername(nextUsername);
+      setUsernameDraft(nextUsername ?? "");
       const origin =
         typeof window !== "undefined" && window.location.origin
           ? window.location.origin
@@ -163,6 +164,11 @@ export default function ProfilePage() {
   const [avatarSaving, setAvatarSaving] = useState(false);
   const [avatarMessage, setAvatarMessage] = useState<string | null>(null);
   const [bioMessage, setBioMessage] = useState<string | null>(null);
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [usernameDraft, setUsernameDraft] = useState("");
+  const [usernameSaving, setUsernameSaving] = useState(false);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [usernameMessage, setUsernameMessage] = useState<string | null>(null);
 
   const handleSave = async () => {
     if (!user?.uid) {
@@ -200,6 +206,65 @@ export default function ProfilePage() {
       setAvatarMessage("Profile Image Changed Successfully");
     } finally {
       setAvatarSaving(false);
+    }
+  };
+
+  const handleSaveUsername = async () => {
+    if (!user?.uid) {
+      return;
+    }
+    const trimmed = usernameDraft.trim().toLowerCase();
+    const cleaned = trimmed.replace(/[^a-z0-9_]/g, "");
+    setUsernameError(null);
+    setUsernameMessage(null);
+    if (!cleaned) {
+      setUsernameError("Enter a username.");
+      return;
+    }
+    if (cleaned.length < 3) {
+      setUsernameError("Username must be at least 3 characters.");
+      return;
+    }
+    if (cleaned.length > 24) {
+      setUsernameError("Username must be at most 24 characters.");
+      return;
+    }
+    if (cleaned === username) {
+      setUsernameError("This is already your username.");
+      return;
+    }
+    setUsernameSaving(true);
+    try {
+      const existing = await getDocs(
+        query(collection(db, "users"), where("username", "==", cleaned))
+      );
+      let takenByOther = false;
+      existing.forEach(docSnap => {
+        if (docSnap.id !== user.uid) {
+          takenByOther = true;
+        }
+      });
+      if (takenByOther) {
+        setUsernameError("That username is already taken.");
+        return;
+      }
+      const ref = doc(db, "users", user.uid);
+      await updateDoc(ref, {
+        username: cleaned
+      });
+      setUsername(cleaned);
+      setUsernameDraft(cleaned);
+      const origin =
+        typeof window !== "undefined" && window.location.origin
+          ? window.location.origin
+          : "";
+      if (origin) {
+        setShareUrl(`${origin}/profile/${cleaned}`);
+      }
+      setIsEditingUsername(false);
+      setUsernameMessage("Username changed successfully");
+    } finally {
+      setUsernameSaving(false);
     }
   };
 
@@ -326,10 +391,75 @@ export default function ProfilePage() {
               <p className="text-xs text-slate-600 dark:text-slate-400">Current profile image</p>
             </div>
           )}
-          <p className="text-xs text-slate-600 dark:text-slate-400">
-            Username:{" "}
-            <span className="font-mono text-slate-800 dark:text-slate-200">{profileTitle}</span>
-          </p>
+          {!isEditingUsername ? (
+            <>
+              <p className="text-xs text-slate-600 dark:text-slate-400">
+                Username:{" "}
+                <span className="font-mono text-slate-800 dark:text-slate-200">
+                  {profileTitle}
+                </span>
+              </p>
+              <div className="flex justify-end pt-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setUsernameError(null);
+                    setUsernameMessage(null);
+                    setIsEditingUsername(true);
+                  }}
+                  disabled={usernameSaving || !username}
+                >
+                  Change username
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="space-y-1 pt-1">
+                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                  New username
+                </label>
+                <Input
+                  type="text"
+                  value={usernameDraft}
+                  onChange={event => setUsernameDraft(event.target.value)}
+                  autoComplete="off"
+                />
+                <p className="text-[11px] text-slate-500 dark:text-slate-500">
+                  Use 3–24 characters: letters, numbers, and underscores only.
+                </p>
+              </div>
+              <div className="flex justify-end gap-2 pt-1">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    setUsernameDraft(username ?? "");
+                    setUsernameError(null);
+                    setIsEditingUsername(false);
+                  }}
+                  disabled={usernameSaving}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleSaveUsername}
+                  disabled={usernameSaving}
+                >
+                  {usernameSaving ? "Saving..." : "Save username"}
+                </Button>
+              </div>
+            </>
+          )}
+          {usernameError && (
+            <p className="text-xs text-rose-400">{usernameError}</p>
+          )}
+          {usernameMessage && (
+            <p className="text-xs text-emerald-400">{usernameMessage}</p>
+          )}
           {joinedText && (
             <p className="text-xs text-slate-600 dark:text-slate-400">Joined {joinedText}</p>
           )}

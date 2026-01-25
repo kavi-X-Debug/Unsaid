@@ -306,8 +306,10 @@ export default function InboxPage() {
   };
 
   const publishPoll = async (id: string) => {
+    const selectedIndex = pollSelections[id] ?? null;
     await updateDoc(doc(db, "polls", id), {
-      isPublished: true
+      isPublished: true,
+      ownerSelection: selectedIndex
     });
   };
 

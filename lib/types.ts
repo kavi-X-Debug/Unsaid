@@ -47,4 +47,5 @@ export type Poll = {
   isPublished: boolean;
   isReported?: boolean;
   createdAt: Timestamp | null;
+  ownerSelection?: number | null;
 };
