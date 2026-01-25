@@ -6,6 +6,7 @@ import { AuthProvider } from "../components/auth/auth-provider";
 import { ThemeProvider } from "../components/theme/theme-provider";
 import { ThemeToggle } from "../components/theme/theme-toggle";
 import { PageTransition } from "../components/ui/motion";
+import { Navbar } from "../components/ui/navbar";
 
 export const metadata: Metadata = {
   title: "Unsaid",
@@ -28,6 +29,7 @@ export default function RootLayout(props: { children: ReactNode }) {
         <ThemeProvider initialTheme={resolvedTheme}>
           <ThemeToggle />
           <AuthProvider>
+            <Navbar />
             <PageTransition>{props.children}</PageTransition>
           </AuthProvider>
         </ThemeProvider>
