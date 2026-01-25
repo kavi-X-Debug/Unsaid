@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   collection,
   deleteDoc,
@@ -24,6 +24,52 @@ import { Button } from "../../components/ui/button";
 import { Textarea } from "../../components/ui/textarea";
 import { Input } from "../../components/ui/input";
 import { Modal } from "../../components/ui/modal";
+import loadingAnimationData from "../../loading.json";
+
+function LoadingAnimation() {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    let animation: any;
+    let cancelled = false;
+
+    const load = async () => {
+      if (!containerRef.current) {
+        return;
+      }
+      const lottie = await import("lottie-web");
+      if (cancelled || !containerRef.current) {
+        return;
+      }
+      const instance = lottie.default ?? lottie;
+      animation = instance.loadAnimation({
+        container: containerRef.current,
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        animationData: loadingAnimationData
+      });
+    };
+
+    load();
+
+    return () => {
+      cancelled = true;
+      if (animation) {
+        animation.destroy();
+      }
+    };
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      className="w-40 h-40"
+      aria-label="Loading"
+      role="status"
+    />
+  );
+}
 
 type InboxItemType = "question" | "poll";
 
@@ -440,7 +486,10 @@ export default function InboxPage() {
   if (!user && loading) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <p className="text-slate-500 dark:text-slate-400">Loading inbox...</p>
+        <div className="flex flex-col items-center gap-4">
+          <LoadingAnimation />
+          <p className="text-slate-500 dark:text-slate-400">Loading inbox...</p>
+        </div>
       </main>
     );
   }
