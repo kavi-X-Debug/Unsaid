@@ -3,16 +3,17 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useAuth } from "../auth/auth-provider";
 import logo from "../../icon.jpg";
-
-const links = [
-  { href: "/", label: "Home" },
-  { href: "/inbox", label: "Inbox" },
-  { href: "/profile", label: "Profile" }
-];
 
 export function Navbar() {
   const pathname = usePathname();
+  const { user } = useAuth();
+  const links = [
+    { href: "/", label: "Home" },
+    ...(user ? [{ href: "/inbox", label: "Inbox" }] : []),
+    { href: "/profile", label: "Profile" }
+  ];
 
   return (
     <nav className="sticky top-0 z-30 border-b border-slate-200/60 bg-slate-50/80 backdrop-blur-sm dark:border-slate-800/80 dark:bg-slate-950/80">
@@ -48,4 +49,3 @@ export function Navbar() {
     </nav>
   );
 }
-

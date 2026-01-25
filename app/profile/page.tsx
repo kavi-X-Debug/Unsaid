@@ -25,7 +25,6 @@ export default function ProfilePage() {
   const router = useRouter();
   const [username, setUsername] = useState<string | null>(null);
   const [bioDraft, setBioDraft] = useState("");
-  const [avatarUrlDraft, setAvatarUrlDraft] = useState("");
   const [joinedText, setJoinedText] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
@@ -48,12 +47,10 @@ export default function ProfilePage() {
         const data = snap.data() as {
           username?: string;
           bio?: string;
-          avatarUrl?: string;
           createdAt?: any;
         };
         nextUsername = data.username ?? null;
         setBioDraft(data.bio ?? "");
-        setAvatarUrlDraft(data.avatarUrl ?? "");
         if (data.createdAt?.toDate) {
           const date = data.createdAt.toDate() as Date;
           setJoinedText(date.toLocaleDateString());
@@ -82,7 +79,6 @@ export default function ProfilePage() {
           uid: user.uid,
           username: candidate,
           bio: null,
-          avatarUrl: null,
           createdAt: serverTimestamp(),
           settings: {
             positiveOnlyMode: false
@@ -115,13 +111,11 @@ export default function ProfilePage() {
       return;
     }
     const trimmedBio = bioDraft.trim().slice(0, 160);
-    const trimmedAvatar = avatarUrlDraft.trim();
     setSaving(true);
     try {
       const ref = doc(db, "users", user.uid);
       await updateDoc(ref, {
-        bio: trimmedBio || null,
-        avatarUrl: trimmedAvatar || null
+        bio: trimmedBio || null
       });
     } finally {
       setSaving(false);
@@ -203,17 +197,6 @@ export default function ProfilePage() {
               maxLength={160}
             />
           </div>
-          <div className="space-y-2">
-            <p className="text-xs text-slate-500 dark:text-slate-500">
-              Optional avatar image URL used on your public profile.
-            </p>
-            <Input
-              type="url"
-              placeholder="https://example.com/avatar.png"
-              value={avatarUrlDraft}
-              onChange={event => setAvatarUrlDraft(event.target.value)}
-            />
-          </div>
           <div className="flex justify-end">
             <Button type="button" variant="outline" onClick={handleSave} disabled={saving}>
               {saving ? "Saving..." : "Save changes"}
@@ -224,4 +207,3 @@ export default function ProfilePage() {
     </main>
   );
 }
-

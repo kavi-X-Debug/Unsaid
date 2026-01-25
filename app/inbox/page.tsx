@@ -89,9 +89,6 @@ export default function InboxPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
-  const [bioDraft, setBioDraft] = useState("");
-  const [avatarUrlDraft, setAvatarUrlDraft] = useState("");
-  const [savingProfile, setSavingProfile] = useState(false);
   const [pollSelections, setPollSelections] = useState<Record<string, number | null>>({});
 
   useEffect(() => {
@@ -206,44 +203,6 @@ export default function InboxPage() {
     };
     loadProfile();
   }, [user]);
-
-  useEffect(() => {
-    const loadProfileFields = async () => {
-      if (!user?.uid) {
-        return;
-      }
-      try {
-        const ref = doc(db, "users", user.uid);
-        const snap = await getDoc(ref);
-        if (!snap.exists()) {
-          return;
-        }
-        const data = snap.data() as { bio?: string; avatarUrl?: string };
-        setBioDraft(data.bio ?? "");
-        setAvatarUrlDraft(data.avatarUrl ?? "");
-      } catch {
-      }
-    };
-    loadProfileFields();
-  }, [user]);
-
-  const saveProfile = async () => {
-    if (!user?.uid) {
-      return;
-    }
-    const trimmedBio = bioDraft.trim().slice(0, 160);
-    const trimmedAvatar = avatarUrlDraft.trim();
-    setSavingProfile(true);
-    try {
-      const ref = doc(db, "users", user.uid);
-      await updateDoc(ref, {
-        bio: trimmedBio || null,
-        avatarUrl: trimmedAvatar || null
-      });
-    } finally {
-      setSavingProfile(false);
-    }
-  };
 
   const filtered = useMemo(() => {
     const term = search.toLowerCase();
@@ -610,42 +569,6 @@ export default function InboxPage() {
               {grouped.reported.length}
             </p>
           </Card>
-        </section>
-
-        <section className="grid gap-4 md:grid-cols-2">
-          <Card className="p-4 space-y-2 border border-slate-800/70 bg-slate-900/60">
-            <h2 className="text-sm font-semibold text-slate-100">
-              Public bio
-            </h2>
-            <p className="text-xs text-slate-400">
-              Shown on your public profile. Max 160 characters.
-            </p>
-            <Textarea
-              rows={3}
-              value={bioDraft}
-              onChange={event => setBioDraft(event.target.value)}
-              maxLength={160}
-            />
-          </Card>
-          <Card className="p-4 space-y-2 border border-slate-800/70 bg-slate-900/60">
-            <h2 className="text-sm font-semibold text-slate-100">
-              Avatar image URL
-            </h2>
-            <p className="text-xs text-slate-400">
-              Optional image URL used for your profile avatar.
-            </p>
-            <Input
-              type="url"
-              placeholder="https://example.com/avatar.png"
-              value={avatarUrlDraft}
-              onChange={event => setAvatarUrlDraft(event.target.value)}
-            />
-          </Card>
-          <div className="md:col-span-2 flex justify-end">
-            <Button type="button" variant="outline" onClick={saveProfile} disabled={savingProfile}>
-              {savingProfile ? "Saving..." : "Save profile"}
-            </Button>
-          </div>
         </section>
 
         {shareUrl && (
