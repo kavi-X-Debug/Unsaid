@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "firebase/auth";
 import {
@@ -20,6 +21,16 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import Avatar1 from "../../Images/Gemini_Generated_Image_1uzn0a1uzn0a1uzn (1).png";
+import Avatar2 from "../../Images/Gemini_Generated_Image_4mkak64mkak64mka (1).png";
+import Avatar3 from "../../Images/Gemini_Generated_Image_avzbkdavzbkdavzb (1).png";
+import Avatar4 from "../../Images/Gemini_Generated_Image_gjadqvgjadqvgjad (1).png";
+import Avatar5 from "../../Images/Gemini_Generated_Image_i968xni968xni968 (1).png";
+import Avatar6 from "../../Images/Gemini_Generated_Image_mw8kbmmw8kbmmw8k (1).png";
+import Avatar7 from "../../Images/Gemini_Generated_Image_w2jdqew2jdqew2jd (1).png";
+import Avatar8 from "../../Images/Gemini_Generated_Image_wocmn5wocmn5wocm (1).png";
+
+const avatarOptions = [Avatar1, Avatar2, Avatar3, Avatar4, Avatar5, Avatar6, Avatar7, Avatar8];
 
 export default function ProfilePage() {
   const { user, loading } = useAuth();
@@ -27,6 +38,8 @@ export default function ProfilePage() {
   const [username, setUsername] = useState<string | null>(null);
   const [bioDraft, setBioDraft] = useState("");
   const [savedBio, setSavedBio] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarDraft, setAvatarDraft] = useState<string | null>(null);
   const [joinedText, setJoinedText] = useState<string | null>(null);
   const [viewCount, setViewCount] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
@@ -56,6 +69,7 @@ export default function ProfilePage() {
         const data = snap.data() as {
           username?: string;
           bio?: string;
+          avatarUrl?: string;
           createdAt?: any;
           profileViews?: number;
         };
@@ -63,6 +77,9 @@ export default function ProfilePage() {
         const initialBio = (data.bio as string | null) ?? "";
         setBioDraft(initialBio);
         setSavedBio(initialBio);
+        const initialAvatar = (data.avatarUrl as string | null) ?? null;
+        setAvatarUrl(initialAvatar);
+        setAvatarDraft(initialAvatar);
         if (typeof data.profileViews === "number") {
           setViewCount(data.profileViews);
         } else {
@@ -105,6 +122,8 @@ export default function ProfilePage() {
         nextUsername = candidate;
         setBioDraft("");
         setSavedBio("");
+        setAvatarUrl(null);
+        setAvatarDraft(null);
       }
       setUsername(nextUsername);
       const origin =
@@ -139,6 +158,8 @@ export default function ProfilePage() {
 
   const [isEditingBio, setIsEditingBio] = useState(false);
 
+  const [avatarSaving, setAvatarSaving] = useState(false);
+
   const handleSave = async () => {
     if (!user?.uid) {
       return;
@@ -155,6 +176,22 @@ export default function ProfilePage() {
       setIsEditingBio(false);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSaveAvatar = async () => {
+    if (!user?.uid) {
+      return;
+    }
+    setAvatarSaving(true);
+    try {
+      const ref = doc(db, "users", user.uid);
+      await updateDoc(ref, {
+        avatarUrl: avatarDraft ?? null
+      });
+      setAvatarUrl(avatarDraft ?? null);
+    } finally {
+      setAvatarSaving(false);
     }
   };
 
@@ -315,6 +352,50 @@ export default function ProfilePage() {
                 </div>
               </>
             )}
+          </div>
+        </Card>
+
+        <Card className="p-4 space-y-4">
+          <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+            Profile image
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-500">
+            Choose an image to use as your profile picture.
+          </p>
+          <div className="grid grid-cols-4 gap-3">
+            {avatarOptions.map((image, index) => {
+              const isSelected = avatarDraft === image.src;
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => setAvatarDraft(image.src)}
+                  className={`relative flex items-center justify-center rounded-full border p-0.5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 ${
+                    isSelected
+                      ? "border-sky-500 ring-1 ring-sky-400"
+                      : "border-slate-300 hover:border-slate-400 dark:border-slate-700 dark:hover:border-slate-500"
+                  }`}
+                >
+                  <Image
+                    src={image}
+                    alt="Profile choice"
+                    width={56}
+                    height={56}
+                    className="h-14 w-14 rounded-full object-cover"
+                  />
+                </button>
+              );
+            })}
+          </div>
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleSaveAvatar}
+              disabled={avatarSaving || avatarDraft === avatarUrl}
+            >
+              {avatarSaving ? "Saving..." : "Save profile image"}
+            </Button>
           </div>
         </Card>
 
