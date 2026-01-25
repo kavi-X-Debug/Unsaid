@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "firebase/auth";
 import {
   collection,
   doc,
@@ -26,10 +27,17 @@ export default function ProfilePage() {
   const [username, setUsername] = useState<string | null>(null);
   const [bioDraft, setBioDraft] = useState("");
   const [joinedText, setJoinedText] = useState<string | null>(null);
+  const [viewCount, setViewCount] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [initializing, setInitializing] = useState(true);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordMessage, setPasswordMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (loading) {
@@ -48,9 +56,15 @@ export default function ProfilePage() {
           username?: string;
           bio?: string;
           createdAt?: any;
+          profileViews?: number;
         };
         nextUsername = data.username ?? null;
         setBioDraft(data.bio ?? "");
+        if (typeof data.profileViews === "number") {
+          setViewCount(data.profileViews);
+        } else {
+          setViewCount(0);
+        }
         if (data.createdAt?.toDate) {
           const date = data.createdAt.toDate() as Date;
           setJoinedText(date.toLocaleDateString());
@@ -79,6 +93,7 @@ export default function ProfilePage() {
           uid: user.uid,
           username: candidate,
           bio: null,
+          profileViews: 0,
           createdAt: serverTimestamp(),
           settings: {
             positiveOnlyMode: false
@@ -136,6 +151,48 @@ export default function ProfilePage() {
     }
   };
 
+  const canChangePassword = useMemo(() => {
+    if (!user) {
+      return false;
+    }
+    return user.providerData.some(provider => provider.providerId === "password");
+  }, [user]);
+
+  const handleChangePassword = async () => {
+    setPasswordError(null);
+    setPasswordMessage(null);
+    if (!user?.email) {
+      setPasswordError("Password change is not available for this account.");
+      return;
+    }
+    if (!currentPassword || !newPassword || !confirmNewPassword) {
+      setPasswordError("Fill in all password fields.");
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPasswordError("New password must be at least 6 characters.");
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError("New passwords do not match.");
+      return;
+    }
+    setPasswordSaving(true);
+    try {
+      const credential = EmailAuthProvider.credential(user.email, currentPassword);
+      await reauthenticateWithCredential(user, credential);
+      await updatePassword(user, newPassword);
+      setPasswordMessage("Password updated successfully.");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmNewPassword("");
+    } catch {
+      setPasswordError("Could not update password. Check your current password and try again.");
+    } finally {
+      setPasswordSaving(false);
+    }
+  };
+
   if (loading || initializing) {
     return (
       <main className="min-h-screen flex items-center justify-center px-4">
@@ -168,6 +225,11 @@ export default function ProfilePage() {
           </p>
           {joinedText && (
             <p className="text-xs text-slate-600 dark:text-slate-400">Joined {joinedText}</p>
+          )}
+          {viewCount != null && (
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Profile views: {viewCount.toLocaleString()}
+            </p>
           )}
           {shareUrl && (
             <div className="flex items-center justify-between gap-3 pt-2">
@@ -202,6 +264,76 @@ export default function ProfilePage() {
               {saving ? "Saving..." : "Save changes"}
             </Button>
           </div>
+        </Card>
+
+        <Card className="p-4 space-y-4">
+          <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+            Change password
+          </h2>
+          {canChangePassword ? (
+            <>
+              <div className="space-y-1 text-left">
+                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                  Current password
+                </label>
+                <Input
+                  type="password"
+                  autoComplete="current-password"
+                  value={currentPassword}
+                  onChange={event => setCurrentPassword(event.target.value)}
+                  minLength={6}
+                  required
+                />
+              </div>
+              <div className="space-y-1 text-left">
+                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                  New password
+                </label>
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  value={newPassword}
+                  onChange={event => setNewPassword(event.target.value)}
+                  minLength={6}
+                  required
+                />
+              </div>
+              <div className="space-y-1 text-left">
+                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                  Confirm new password
+                </label>
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  value={confirmNewPassword}
+                  onChange={event => setConfirmNewPassword(event.target.value)}
+                  minLength={6}
+                  required
+                />
+              </div>
+              {passwordError && (
+                <p className="text-xs text-rose-400">{passwordError}</p>
+              )}
+              {passwordMessage && (
+                <p className="text-xs text-emerald-400">{passwordMessage}</p>
+              )}
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleChangePassword}
+                  disabled={passwordSaving}
+                >
+                  {passwordSaving ? "Updating..." : "Update password"}
+                </Button>
+              </div>
+            </>
+          ) : (
+            <p className="text-xs text-slate-500 dark:text-slate-500">
+              This account is signed in with a provider that does not use a password.
+              Use your sign-in provider to manage security settings.
+            </p>
+          )}
         </Card>
       </div>
     </main>
