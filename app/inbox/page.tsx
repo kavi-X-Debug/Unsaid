@@ -91,6 +91,7 @@ export default function InboxPage() {
   const [bioDraft, setBioDraft] = useState("");
   const [avatarUrlDraft, setAvatarUrlDraft] = useState("");
   const [savingProfile, setSavingProfile] = useState(false);
+  const [pollSelections, setPollSelections] = useState<Record<string, number | null>>({});
 
   useEffect(() => {
     if (loading) {
@@ -435,11 +436,31 @@ export default function InboxPage() {
             <p className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
               {questionText ?? "Poll"}
             </p>
-            <ul className="space-y-1 text-xs text-slate-600 dark:text-slate-400">
-              {poll.options.map(option => (
-                <li key={option.optionText}>{option.optionText}</li>
-              ))}
-            </ul>
+            <div className="space-y-1 text-xs text-slate-600 dark:text-slate-400">
+              {poll.options.map((option, index) => {
+                const selectedIndex = pollSelections[item.id] ?? null;
+                const isSelectedOption = selectedIndex === index;
+                return (
+                  <button
+                    key={option.optionText}
+                    type="button"
+                    onClick={() =>
+                      setPollSelections(previous => ({
+                        ...previous,
+                        [item.id]: index
+                      }))
+                    }
+                    className={`w-full text-left rounded-full px-3 py-1 transition ${
+                      isSelectedOption
+                        ? "bg-sky-500/10 text-sky-400"
+                        : "bg-transparent hover:bg-slate-800/40"
+                    }`}
+                  >
+                    {option.optionText}
+                  </button>
+                );
+              })}
+            </div>
             <div className="flex gap-2 justify-end">
               <Button variant="ghost" type="button" onClick={() => reportItem(item)}>
                 Report
@@ -536,18 +557,6 @@ export default function InboxPage() {
               Manage your anonymous questions and polls in one place.
             </p>
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={async () => {
-              const { signOut } = await import("firebase/auth");
-              const { auth } = await import("../../lib/firebase");
-              await signOut(auth);
-              router.push("/");
-            }}
-          >
-            Log out
-          </Button>
         </header>
 
         <section className="grid gap-4 md:grid-cols-2">
@@ -638,6 +647,20 @@ export default function InboxPage() {
           initialKey="new"
           renderContent={renderTabContent}
         />
+        <section className="flex justify-end pt-4 pb-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={async () => {
+              const { signOut } = await import("firebase/auth");
+              const { auth } = await import("../../lib/firebase");
+              await signOut(auth);
+              router.push("/");
+            }}
+          >
+            Log out
+          </Button>
+        </section>
       </div>
     </main>
   );

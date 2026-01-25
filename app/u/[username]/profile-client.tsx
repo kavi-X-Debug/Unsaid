@@ -196,7 +196,14 @@ export function ProfilePageClient(props: Props) {
           <div className="space-y-1">
             <h1 className="text-2xl font-semibold">{profileTitle}</h1>
             {displayBio && (
-              <p className="text-sm text-slate-700 dark:text-slate-300">{displayBio}</p>
+              <motion.p
+                className="text-sm text-slate-700 dark:text-slate-300"
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration, ease: "easeOut", delay: prefersReducedMotion ? 0 : 0.05 }}
+              >
+                {displayBio}
+              </motion.p>
             )}
             <p className="text-xs text-slate-600 dark:text-slate-500">
               Send an anonymous question or poll. Your identity is never stored.
