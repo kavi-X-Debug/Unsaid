@@ -11,6 +11,7 @@ export type AppUser = {
   avatarUrl?: string;
   createdAt: Timestamp | null;
   settings: UserSettings;
+  profileViews?: number;
 };
 
 export type ReactionCounts = {

@@ -16,6 +16,8 @@ type PollDraftType = "yes_no" | "multiple_choice";
 type ProfileStats = {
   totalQuestions: number;
   totalAnswered: number;
+  totalPolls: number;
+  totalViews: number;
 };
 
 type Props = {
@@ -37,6 +39,8 @@ export function ProfilePageClient(props: Props) {
 
   const prefersReducedMotion = useReducedMotion();
   const duration = prefersReducedMotion ? 0 : 0.18;
+
+  const [copied, setCopied] = useState(false);
 
   const profileTitle = useMemo(() => {
     return `@${props.user.username}`;
@@ -60,6 +64,24 @@ export function ProfilePageClient(props: Props) {
     }
     return username.charAt(0).toUpperCase();
   }, [props.user.username, props.username]);
+
+  const handleShareProfile = async () => {
+    setCopied(false);
+    try {
+      const href =
+        typeof window !== "undefined" && window.location
+          ? window.location.href
+          : `https://unsaid.app/profile/${props.username}`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(href);
+        setCopied(true);
+        setTimeout(() => {
+          setCopied(false);
+        }, 2000);
+      }
+    } catch {
+    }
+  };
 
   useEffect(() => {
     const next: Record<string, number | null> = {};
@@ -181,56 +203,90 @@ export function ProfilePageClient(props: Props) {
     <main className="min-h-screen px-4 py-10 flex justify-center">
       <div className="w-full max-w-2xl space-y-6">
         <motion.header
-          className="space-y-3 flex items-center gap-4"
+          className="space-y-3 flex items-center justify-between gap-4"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration, ease: "easeOut" }}
         >
-          <div className="relative h-16 w-16 rounded-full bg-sky-500/10 border border-sky-500 flex items-center justify-center text-lg font-semibold text-sky-600 dark:text-sky-300 overflow-hidden">
-            {props.user.avatarUrl ? (
-              <Image src={props.user.avatarUrl} alt={profileTitle} fill className="object-cover" />
-            ) : (
-              avatarLetter
-            )}
+          <div className="flex items-center gap-4">
+            <div className="relative h-16 w-16 rounded-full bg-sky-500/10 border border-sky-500 flex items-center justify-center text-lg font-semibold text-sky-600 dark:text-sky-300 overflow-hidden">
+              {props.user.avatarUrl ? (
+                <Image
+                  src={props.user.avatarUrl}
+                  alt={profileTitle}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                avatarLetter
+              )}
+            </div>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-semibold">{profileTitle}</h1>
+              {displayBio && (
+                <motion.p
+                  className="text-sm text-slate-700 dark:text-slate-300"
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration,
+                    ease: "easeOut",
+                    delay: prefersReducedMotion ? 0 : 0.05
+                  }}
+                >
+                  {displayBio}
+                </motion.p>
+              )}
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center rounded-full bg-slate-900/70 px-3 py-1 text-[11px] text-slate-200 border border-slate-700">
+                  Anonymous mode
+                </span>
+                <span className="text-[11px] text-slate-500">
+                  Privacy-first Q&A profile
+                </span>
+              </div>
+            </div>
           </div>
-          <div className="space-y-1">
-            <h1 className="text-2xl font-semibold">{profileTitle}</h1>
-            {displayBio && (
-              <motion.p
-                className="text-sm text-slate-700 dark:text-slate-300"
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration, ease: "easeOut", delay: prefersReducedMotion ? 0 : 0.05 }}
-              >
-                {displayBio}
-              </motion.p>
-            )}
-            <p className="text-xs text-slate-600 dark:text-slate-500">
-              Send an anonymous question or poll. Your identity is never stored.
+          <div className="flex flex-col items-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleShareProfile}
+              className="text-xs px-3 py-1 h-auto"
+            >
+              {copied ? "Link copied" : "Share profile"}
+            </Button>
+            <p className="text-[11px] text-slate-500">
+              {props.stats.totalViews.toLocaleString()} profile views
             </p>
           </div>
         </motion.header>
 
-        <Card className="p-4">
-          <div className="flex items-center justify-between text-xs sm:text-sm">
+        <Card className="p-4 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow">
+          <div className="grid grid-cols-3 gap-4 text-xs sm:text-sm">
             <div className="space-y-1">
               <p className="text-slate-500 dark:text-slate-400">Questions received</p>
               <p className="text-lg font-semibold">
                 {props.stats.totalQuestions.toLocaleString()}
               </p>
             </div>
-            <div className="h-10 w-px bg-slate-200 dark:bg-slate-800" />
-            <div className="space-y-1 text-right">
+            <div className="space-y-1">
               <p className="text-slate-500 dark:text-slate-400">Questions answered</p>
               <p className="text-lg font-semibold">
                 {props.stats.totalAnswered.toLocaleString()}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-slate-500 dark:text-slate-400">Polls published</p>
+              <p className="text-lg font-semibold">
+                {props.stats.totalPolls.toLocaleString()}
               </p>
             </div>
           </div>
         </Card>
 
         <section className="space-y-4">
-          <Card className="p-4 space-y-3">
+          <Card className="p-4 space-y-3 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow">
             <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
               Ask a question
             </h2>
@@ -245,7 +301,7 @@ export function ProfilePageClient(props: Props) {
             </Button>
           </Card>
 
-          <Card className="p-4 space-y-3">
+          <Card className="p-4 space-y-3 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow">
             <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
               Send a poll
             </h2>
@@ -322,7 +378,10 @@ export function ProfilePageClient(props: Props) {
           )}
           <StaggerContainer>
             {props.questions.map(question => (
-              <Card key={question.id} className="p-4 space-y-3">
+              <Card
+                key={question.id}
+                className="p-4 space-y-3 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow"
+              >
                 <div className="space-y-2">
                   <p className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
                     {question.questionText}
@@ -351,7 +410,10 @@ export function ProfilePageClient(props: Props) {
           )}
           <StaggerContainer>
             {props.polls.map(poll => (
-              <Card key={poll.id} className="p-4 space-y-3">
+              <Card
+                key={poll.id}
+                className="p-4 space-y-3 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow"
+              >
                 <p className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
                   {poll.questionText ?? "Poll"}
                 </p>

@@ -198,7 +198,7 @@ export default function InboxPage() {
         if (!origin || !username) {
           return;
         }
-        setShareUrl(`${origin}/u/${username.toLowerCase()}`);
+        setShareUrl(`${origin}/profile/${username.toLowerCase()}`);
       } catch {
         setShareUrl(null);
       }
