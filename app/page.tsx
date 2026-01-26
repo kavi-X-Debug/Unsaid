@@ -1,7 +1,55 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/components/auth/auth-provider";
+
+type Testimonial = {
+  name: string;
+  handle: string;
+  role: string;
+  quote: string;
+  image: string;
+};
+
+const testimonials: Testimonial[] = [
+  {
+    name: "Aarav",
+    handle: "@aaravwrites",
+    role: "Student",
+    quote:
+      "Unsaid makes it so much easier to ask the things I am nervous to say out loud.",
+    image:
+      "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=120&h=120&dpr=2"
+  },
+  {
+    name: "Mia",
+    handle: "@miacreates",
+    role: "Content creator",
+    quote:
+      "My inbox feels organized instead of chaotic. It is the only anonymous Q&A I actually enjoy using.",
+    image:
+      "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=120&h=120&dpr=2"
+  },
+  {
+    name: "Noah",
+    handle: "@noahcommunity",
+    role: "Community lead",
+    quote:
+      "We use Unsaid for quick pulse checks and questions. People participate more when it is anonymous.",
+    image:
+      "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=120&h=120&dpr=2"
+  },
+  {
+    name: "Sara",
+    handle: "@sara.codes",
+    role: "Developer",
+    quote:
+      "I like that I can answer in my own time and only publish what feels right.",
+    image:
+      "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=120&h=120&dpr=2"
+  }
+];
 
 export default function LandingPage() {
   const { user, loading } = useAuth();
@@ -164,6 +212,46 @@ export default function LandingPage() {
                 <li>Communities that need quick anonymous polls and questions.</li>
               </ul>
             </div>
+          </div>
+        </div>
+      </section>
+      <section className="border-t border-slate-800/60 bg-black/90">
+        <div className="mx-auto max-w-5xl px-4 py-12 space-y-8">
+          <div className="text-center space-y-2">
+            <h2 className="text-xl font-semibold text-slate-100">
+              What people are saying about Unsaid
+            </h2>
+            <p className="text-sm text-slate-400">
+              A few made-up comments to show how feedback on Unsaid can look.
+            </p>
+          </div>
+          <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory">
+            {testimonials.map(testimonial => (
+              <div
+                key={testimonial.handle}
+                className="snap-center shrink-0 w-[260px] sm:w-[320px] rounded-2xl border border-slate-800 bg-slate-900/80 p-4 space-y-3"
+              >
+                <div className="flex items-center gap-3">
+                  <Image
+                    src={testimonial.image}
+                    alt={testimonial.name}
+                    width={48}
+                    height={48}
+                    className="h-12 w-12 rounded-full object-cover border border-slate-700"
+                  />
+                  <div className="space-y-0.5">
+                    <p className="text-sm font-semibold text-slate-100">
+                      {testimonial.name}
+                    </p>
+                    <p className="text-xs text-slate-400">{testimonial.handle}</p>
+                    <p className="text-[11px] text-slate-500">{testimonial.role}</p>
+                  </div>
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  “{testimonial.quote}”
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

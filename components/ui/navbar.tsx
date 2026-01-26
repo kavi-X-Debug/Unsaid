@@ -5,12 +5,12 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { Kaushan_Script } from "next/font/google";
+import { Aclonica } from "next/font/google";
 import { useAuth } from "../auth/auth-provider";
 import { db } from "../../lib/firebase";
 import logo from "../../icon.jpg";
 
-const logoFont = Kaushan_Script({
+const logoFont = Aclonica({
   subsets: ["latin"],
   weight: "400"
 });
@@ -77,7 +77,7 @@ export function Navbar() {
             <Image src={logo} alt="Unsaid" fill sizes="28px" className="object-cover" />
           </div>
           <span
-            className={`${logoFont.className} text-base font-semibold tracking-tight text-slate-800 dark:text-slate-100`}
+            className={`${logoFont.className} text-lg font-semibold tracking-tight text-slate-800 dark:text-slate-100`}
           >
             Unsaid
           </span>
