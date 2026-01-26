@@ -5,12 +5,12 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { Aclonica } from "next/font/google";
+import { Rubik_Doodle_Shadow } from "next/font/google";
 import { useAuth } from "../auth/auth-provider";
 import { db } from "../../lib/firebase";
 import logo from "../../icon.jpg";
 
-const logoFont = Aclonica({
+const logoFont = Rubik_Doodle_Shadow({
   subsets: ["latin"],
   weight: "400"
 });
@@ -77,9 +77,9 @@ export function Navbar() {
             <Image src={logo} alt="Unsaid" fill sizes="28px" className="object-cover" />
           </div>
           <span
-            className={`${logoFont.className} text-lg font-semibold tracking-tight text-slate-800 dark:text-slate-100`}
+            className={`${logoFont.className} text-2xl font-semibold tracking-[0.28em] text-slate-800 dark:text-slate-100`}
           >
-            Unsaid
+            UnSaid
           </span>
         </Link>
         <div className="flex items-center gap-1 rounded-full bg-slate-100 px-1 py-0.5 text-xs border border-slate-200 dark:bg-slate-900/80 dark:border-slate-800 max-w-full overflow-x-auto">

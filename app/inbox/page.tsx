@@ -488,7 +488,7 @@ export default function InboxPage() {
   }
 
   return (
-    <main className="min-h-screen px-4 py-8 flex justify-center bg-gradient-to-b from-slate-950 via-slate-950 to-black">
+    <main className="min-h-screen px-4 py-8 flex justify-center bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-950 dark:via-slate-950 dark:to-black">
       <Modal
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
