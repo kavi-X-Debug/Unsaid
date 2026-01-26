@@ -38,7 +38,6 @@ export function ProfilePageClient(props: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pollVotes, setPollVotes] = useState<Record<string, number | null>>({});
-  const [hasAsked, setHasAsked] = useState(false);
   const [questions, setQuestions] = useState<Question[]>(props.questions);
   const [polls, setPolls] = useState<Poll[]>(props.polls);
 
@@ -105,18 +104,6 @@ export function ProfilePageClient(props: Props) {
     }
     setPollVotes(next);
   }, [props.polls]);
-
-  useEffect(() => {
-    try {
-      const key = `unsaid_has_asked_${props.username}`;
-      const stored =
-        typeof window !== "undefined" ? window.localStorage.getItem(key) : null;
-      if (stored === "1") {
-        setHasAsked(true);
-      }
-    } catch {
-    }
-  }, [props.username]);
 
   useEffect(() => {
     const questionsQuery = query(
@@ -187,14 +174,6 @@ export function ProfilePageClient(props: Props) {
         setError("Could not send your question right now.");
       } else {
         setQuestionText("");
-        try {
-          const key = `unsaid_has_asked_${props.username}`;
-          if (typeof window !== "undefined") {
-            window.localStorage.setItem(key, "1");
-          }
-        } catch {
-        }
-        setHasAsked(true);
       }
     } finally {
       setSubmitting(false);
@@ -359,23 +338,15 @@ export function ProfilePageClient(props: Props) {
             <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
               Ask a question
             </h2>
-            {hasAsked ? (
-              <p className="text-xs text-slate-600 dark:text-slate-500">
-                You already sent a question. You can react to answers instead.
-              </p>
-            ) : (
-              <>
-                <Textarea
-                  rows={3}
-                  value={questionText}
-                  onChange={event => setQuestionText(event.target.value)}
-                  placeholder="What's on your mind?"
-                />
-                <Button onClick={handleAsk} disabled={submitting} fullWidth>
-                  {submitting ? "Sending..." : "Send anonymously"}
-                </Button>
-              </>
-            )}
+            <Textarea
+              rows={3}
+              value={questionText}
+              onChange={event => setQuestionText(event.target.value)}
+              placeholder="What's on your mind?"
+            />
+            <Button onClick={handleAsk} disabled={submitting} fullWidth>
+              {submitting ? "Sending..." : "Send anonymously"}
+            </Button>
           </Card>
 
           <Card className="p-4 space-y-3 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow">

@@ -42,6 +42,17 @@ export function ReactionBar(props: Props) {
     }
   }, [storageKey]);
 
+  useEffect(() => {
+    if (hasReacted) {
+      return;
+    }
+    setCounts({
+      heart: props.initialCounts?.heart ?? 0,
+      laugh: props.initialCounts?.laugh ?? 0,
+      wow: props.initialCounts?.wow ?? 0
+    });
+  }, [props.initialCounts, hasReacted]);
+
   const handleReact = async (reaction: ReactionKey) => {
     if (hasReacted) {
       return;
