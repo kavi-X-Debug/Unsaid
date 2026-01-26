@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import type { User } from "firebase/auth";
 import {
   GoogleAuthProvider,
+  FacebookAuthProvider,
   sendEmailVerification,
   signInWithEmailAndPassword,
   signInWithPopup
@@ -31,6 +32,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingGoogle, setLoadingGoogle] = useState(false);
+   const [loadingFacebook, setLoadingFacebook] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -117,6 +119,31 @@ export default function LoginPage() {
     }
   };
 
+  const handleFacebook = async () => {
+    setError(null);
+    setMessage(null);
+    setLoadingFacebook(true);
+    try {
+      const provider = new FacebookAuthProvider();
+      const credential = await signInWithPopup(auth, provider);
+      if (credential.user) {
+        if (!credential.user.emailVerified) {
+          await sendEmailVerification(credential.user);
+          setError("Please verify your email before logging in.");
+          setMessage("We sent a verification link to your email. Please check your inbox.");
+          return;
+        }
+        await ensureUserProfile(credential.user);
+        router.push("/inbox");
+      }
+    } catch (err) {
+      console.error("Facebook sign-in error (login):", err);
+      setError("Could not sign in with Facebook. Try again.");
+    } finally {
+      setLoadingFacebook(false);
+    }
+  };
+
   return (
     <main className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-slate-950 via-slate-950 to-black">
       <div className="max-w-md w-full space-y-6">
@@ -169,15 +196,26 @@ export default function LoginPage() {
             <span>or</span>
             <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            fullWidth
-            disabled={loadingGoogle}
-            onClick={handleGoogle}
-          >
-            {loadingGoogle ? "Connecting to Google..." : "Continue with Google"}
-          </Button>
+          <div className="space-y-2">
+            <Button
+              type="button"
+              variant="outline"
+              fullWidth
+              disabled={loadingGoogle}
+              onClick={handleGoogle}
+            >
+              {loadingGoogle ? "Connecting to Google..." : "Continue with Google"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              fullWidth
+              disabled={loadingFacebook}
+              onClick={handleFacebook}
+            >
+              {loadingFacebook ? "Connecting to Facebook..." : "Continue with Facebook"}
+            </Button>
+          </div>
         </Card>
         <p className="text-sm text-center text-slate-500 dark:text-slate-400">
           New here?{" "}

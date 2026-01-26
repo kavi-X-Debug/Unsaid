@@ -464,12 +464,13 @@ export default function InboxPage() {
                 })}
               </div>
               <div className="flex gap-2 justify-end">
-                <Button variant="ghost" type="button" onClick={() => reportItem(item)}>
-                  Report
-                </Button>
                 {!poll.isPublished && (
-                  <Button type="button" onClick={() => publishPoll(item.id)}>
-                    Publish poll
+                  <Button
+                    type="button"
+                    onClick={() => publishPoll(item.id)}
+                    disabled={pollSelections[item.id] == null}
+                  >
+                    Confirm
                   </Button>
                 )}
               </div>

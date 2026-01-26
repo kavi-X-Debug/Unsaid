@@ -17,6 +17,9 @@ export function Card(props: Props) {
     .join(" ");
   const prefersReducedMotion = useReducedMotion();
   const duration = prefersReducedMotion ? 0 : 0.18;
+  const hoverY = prefersReducedMotion ? 0 : -3;
+  const tapY = prefersReducedMotion ? 0 : -1;
+  const tapScale = prefersReducedMotion ? 1 : 0.99;
   const controls = useAnimationControls();
 
   useEffect(() => {
@@ -50,6 +53,8 @@ export function Card(props: Props) {
       className={merged}
       initial={{ opacity: 0, y: 6, scale: 1 }}
       animate={controls}
+      whileHover={{ y: hoverY }}
+      whileTap={{ y: tapY, scale: tapScale }}
       transition={{ duration, ease: "easeOut" }}
     >
       {props.children}

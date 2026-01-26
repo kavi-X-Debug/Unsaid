@@ -54,6 +54,7 @@ export default function ProfilePage() {
   const [passwordMessage, setPasswordMessage] = useState<string | null>(null);
   const [isEditingPassword, setIsEditingPassword] = useState(false);
   const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
+  const isVerified = user?.emailVerified ?? false;
 
   useEffect(() => {
     if (loading) {
@@ -393,12 +394,20 @@ export default function ProfilePage() {
           )}
           {!isEditingUsername ? (
             <>
-              <p className="text-xs text-slate-600 dark:text-slate-400">
-                Username:{" "}
-                <span className="font-mono text-slate-800 dark:text-slate-200">
-                  {profileTitle}
-                </span>
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-slate-600 dark:text-slate-400">
+                  Username:{" "}
+                  <span className="font-mono text-slate-800 dark:text-slate-200">
+                    {profileTitle}
+                  </span>
+                </p>
+                {isVerified && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-300">
+                    <span>✓</span>
+                    <span>Verified</span>
+                  </span>
+                )}
+              </div>
               <div className="flex justify-end pt-1">
                 <Button
                   type="button"
