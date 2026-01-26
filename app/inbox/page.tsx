@@ -89,6 +89,7 @@ export default function InboxPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [copyMessage, setCopyMessage] = useState<string | null>(null);
   const [pollSelections, setPollSelections] = useState<Record<string, number | null>>({});
 
   useEffect(() => {
@@ -559,17 +560,28 @@ export default function InboxPage() {
                   {shareUrl}
                 </p>
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={async () => {
-                  try {
-                    await navigator.clipboard.writeText(shareUrl);
-                  } catch {}
-                }}
-              >
-                Copy link
-              </Button>
+              <div className="flex flex-col items-end gap-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(shareUrl);
+                      setCopyMessage("Link copied ");
+                      setTimeout(() => {
+                        setCopyMessage(null);
+                      }, 1800);
+                    } catch {}
+                  }}
+                >
+                  Copy link
+                </Button>
+                {copyMessage && (
+                  <p className="text-[11px] text-emerald-400">
+                    {copyMessage}
+                  </p>
+                )}
+              </div>
             </Card>
           </section>
         )}
