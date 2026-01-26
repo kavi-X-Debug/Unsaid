@@ -5,12 +5,12 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { Rubik_Doodle_Shadow } from "next/font/google";
+import { Lovers_Quarrel } from "next/font/google";
 import { useAuth } from "../auth/auth-provider";
 import { db } from "../../lib/firebase";
 import logo from "../../icon.jpg";
 
-const logoFont = Rubik_Doodle_Shadow({
+const loversFont = Lovers_Quarrel({
   subsets: ["latin"],
   weight: "400"
 });
@@ -74,12 +74,12 @@ export function Navbar() {
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-2">
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <div className="relative h-8 w-8 overflow-hidden rounded-full border border-slate-300 dark:border-slate-700">
-            <Image src={logo} alt="Unsaid" fill sizes="32px" className="object-cover" />
+            <Image src={logo} alt="UnSaid" fill sizes="32px" className="object-cover" />
           </div>
           <span
-            className={`${logoFont.className} text-2xl sm:text-3xl font-semibold tracking-[0.28em] text-slate-800 dark:text-slate-100 leading-none`}
+            className={`${loversFont.className} text-3xl sm:text-[2.3rem] font-normal text-slate-800 dark:text-slate-100 leading-none`}
           >
-            Unsaid
+            UnSaid
           </span>
         </Link>
         <div className="flex items-center gap-1 rounded-full bg-slate-100 px-1 py-0.5 text-xs border border-slate-200 dark:bg-slate-900/80 dark:border-slate-800 max-w-full overflow-x-auto">
