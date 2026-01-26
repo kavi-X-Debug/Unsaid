@@ -103,12 +103,6 @@ export default function LoginPage() {
       const provider = new GoogleAuthProvider();
       const credential = await signInWithPopup(auth, provider);
       if (credential.user) {
-        if (!credential.user.emailVerified) {
-          await sendEmailVerification(credential.user);
-          setError("Please verify your email before logging in.");
-          setMessage("We sent a verification link to your email. Please check your inbox.");
-          return;
-        }
         await ensureUserProfile(credential.user);
         router.push("/inbox");
       }
@@ -213,7 +207,16 @@ export default function LoginPage() {
               disabled={loadingGoogle}
               onClick={handleGoogle}
             >
-              {loadingGoogle ? "Connecting to Google..." : "Continue with Google"}
+              {loadingGoogle ? (
+                "Connecting to Google..."
+              ) : (
+                <>
+                  <span className="mr-2 inline-flex h-4 w-4 items-center justify-center rounded-sm bg-white">
+                    <span className="inline-block h-2 w-2 bg-[#4285F4]" />
+                  </span>
+                  <span>Continue with Google</span>
+                </>
+              )}
             </Button>
             <Button
               type="button"
@@ -222,7 +225,16 @@ export default function LoginPage() {
               disabled={loadingFacebook}
               onClick={handleFacebook}
             >
-              {loadingFacebook ? "Connecting to Facebook..." : "Continue with Facebook"}
+              {loadingFacebook ? (
+                "Connecting to Facebook..."
+              ) : (
+                <>
+                  <span className="mr-2 inline-flex h-4 w-4 items-center justify-center rounded-[3px] bg-[#1877F2] text-[10px] font-semibold text-white">
+                    f
+                  </span>
+                  <span>Continue with Facebook</span>
+                </>
+              )}
             </Button>
           </div>
         </Card>
