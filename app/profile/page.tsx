@@ -499,30 +499,39 @@ export default function ProfilePage() {
             </p>
           )}
           {shareUrl && (
-            <div className="flex items-center justify-between gap-3 pt-2">
-              <div className="text-xs text-slate-600 dark:text-slate-400 break-all">
-                Public link:{" "}
-                <span className="text-slate-800 dark:text-slate-200">{shareUrl}</span>
-              </div>
-              <div className="flex flex-col items-end gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleShareWhatsApp}
-                  className="text-xs px-3 py-1 h-auto gap-1"
-                >
-                  <span className="text-base">🟢</span>
-                  <span>Share on WhatsApp</span>
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setQrModalOpen(true)}
-                  className="text-xs px-3 py-1 h-auto"
-                >
-                  Show QR code
-                </Button>
-              </div>
+            <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleShareWhatsApp}
+                className="text-xs px-3 py-1 h-auto gap-1"
+              >
+                <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-[#25D366] text-white">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    className="h-3 w-3"
+                  >
+                    <path
+                      fill="currentColor"
+                      d="M12.04 4.5c-3.57 0-6.47 2.9-6.47 6.47 0 1.14.3 2.25.89 3.23l-.58 2.12 2.17-.57a6.47 6.47 0 0 0 3.99 1.37h.01c3.57 0 6.47-2.9 6.47-6.47 0-1.73-.67-3.36-1.89-4.58A6.42 6.42 0 0 0 12.04 4.5zm0-1.5c1.93 0 3.75.75 5.12 2.12A7.94 7.94 0 0 1 20.1 11c0 4.42-3.63 8.03-8.1 8.03a8 8 0 0 1-4.07-1.1L4 18.5l.6-3.86A8 8 0 0 1 4 11c0-4.43 3.6-8 8.04-8z"
+                    />
+                    <path
+                      fill="currentColor"
+                      d="M9.96 8.75c-.15-.34-.31-.35-.46-.35h-.39c-.14 0-.36.05-.55.25s-.72.7-.72 1.7.74 1.97.84 2.11c.1.14 1.43 2.29 3.5 3.12 1.73.68 2.08.54 2.45.51.37-.03 1.21-.49 1.38-.97.17-.48.17-.9.12-.98-.05-.08-.19-.13-.39-.23s-1.21-.6-1.4-.67c-.19-.07-.33-.1-.46.1-.14.2-.53.66-.65.8-.12.14-.24.16-.44.06-.2-.1-.86-.32-1.63-1.01-.6-.53-1.01-1.18-1.13-1.38-.12-.2-.01-.3.09-.4.09-.09.2-.24.3-.36.1-.12.13-.2.19-.34.06-.14.03-.26-.02-.36-.05-.1-.43-1.08-.6-1.48z"
+                    />
+                  </svg>
+                </span>
+                <span>Share on WhatsApp</span>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setQrModalOpen(true)}
+                className="text-xs px-3 py-1 h-auto"
+              >
+                Show QR code
+              </Button>
             </div>
           )}
         </Card>
