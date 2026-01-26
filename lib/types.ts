@@ -28,6 +28,7 @@ export type Question = {
   isAnswered: boolean;
   isReported: boolean;
   createdAt: Timestamp | null;
+  answeredAt?: Timestamp | null;
   reactionCounts?: ReactionCounts;
 };
 

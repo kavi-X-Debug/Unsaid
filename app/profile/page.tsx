@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import QRCode from "react-qr-code";
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "firebase/auth";
 import {
   collection,
@@ -45,7 +46,6 @@ export default function ProfilePage() {
   const [viewCount, setViewCount] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
   const [initializing, setInitializing] = useState(true);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -54,6 +54,7 @@ export default function ProfilePage() {
   const [passwordMessage, setPasswordMessage] = useState<string | null>(null);
   const [isEditingPassword, setIsEditingPassword] = useState(false);
   const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
+  const [qrModalOpen, setQrModalOpen] = useState(false);
   const isVerified = user?.emailVerified ?? false;
 
   useEffect(() => {
@@ -269,18 +270,31 @@ export default function ProfilePage() {
     }
   };
 
-  const handleCopyLink = async () => {
+  const handleShareWhatsApp = () => {
     if (!shareUrl) {
       return;
     }
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      setCopied(true);
-      setTimeout(() => {
-        setCopied(false);
-      }, 1800);
-    } catch {
+    const message = `Check out my Unsaid profile: ${shareUrl}`;
+    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    if (typeof window !== "undefined") {
+      window.open(url, "_blank", "noopener,noreferrer");
     }
+  };
+
+  const renderProfileQrCode = () => {
+    if (!shareUrl) {
+      return null;
+    }
+    return (
+      <div className="flex flex-col items-center gap-3">
+        <div className="p-3 bg-white rounded-2xl">
+          <QRCode value={shareUrl} size={192} style={{ height: "auto", width: "100%" }} />
+        </div>
+        <p className="text-xs text-slate-600 dark:text-slate-400 break-all text-center">
+          {shareUrl}
+        </p>
+      </div>
+    );
   };
 
   const canChangePassword = useMemo(() => {
@@ -365,6 +379,13 @@ export default function ProfilePage() {
             Yes
           </Button>
         </div>
+      </Modal>
+      <Modal
+        open={qrModalOpen}
+        onClose={() => setQrModalOpen(false)}
+        title="Profile QR code"
+      >
+        {renderProfileQrCode()}
       </Modal>
       <div className="w-full max-w-2xl space-y-6">
         <header className="space-y-1">
@@ -483,9 +504,25 @@ export default function ProfilePage() {
                 Public link:{" "}
                 <span className="text-slate-800 dark:text-slate-200">{shareUrl}</span>
               </div>
-              <Button type="button" variant="outline" onClick={handleCopyLink}>
-                {copied ? "Copied" : "Copy link"}
-              </Button>
+              <div className="flex flex-col items-end gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleShareWhatsApp}
+                  className="text-xs px-3 py-1 h-auto gap-1"
+                >
+                  <span className="text-base">🟢</span>
+                  <span>Share on WhatsApp</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setQrModalOpen(true)}
+                  className="text-xs px-3 py-1 h-auto"
+                >
+                  Show QR code
+                </Button>
+              </div>
             </div>
           )}
         </Card>
@@ -731,13 +768,6 @@ export default function ProfilePage() {
           </Button>
         </section>
       </div>
-      {copied && (
-        <div className="fixed inset-x-0 bottom-6 flex justify-center z-50 pointer-events-none">
-          <div className="rounded-full bg-slate-900/95 text-slate-50 px-4 py-2 text-xs shadow-lg shadow-sky-500/30 border border-slate-700">
-            Link copied
-          </div>
-        </div>
-      )}
     </main>
   );
 }

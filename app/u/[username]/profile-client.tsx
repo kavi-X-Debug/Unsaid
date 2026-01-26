@@ -30,6 +30,14 @@ type Props = {
   polls: Poll[];
 };
 
+const formatTime = (timestamp: any) => {
+  if (!timestamp?.toDate) {
+    return "";
+  }
+  const date = timestamp.toDate() as Date;
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+};
+
 export function ProfilePageClient(props: Props) {
   const [questionText, setQuestionText] = useState("");
   const [pollType, setPollType] = useState<PollDraftType>("yes_no");
@@ -415,7 +423,13 @@ export function ProfilePageClient(props: Props) {
           {error && <p className="text-sm text-rose-400">{error}</p>}
         </section>
 
-        <section className="space-y-3">
+        <motion.section
+          className="space-y-3"
+          initial={{ opacity: 0, y: 8 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration, ease: "easeOut" }}
+        >
           <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
             Answered questions
           </h2>
@@ -439,6 +453,19 @@ export function ProfilePageClient(props: Props) {
                       {question.answerText}
                     </p>
                   )}
+                  {(formatTime(question.createdAt) || formatTime((question as any).answeredAt)) && (
+                    <div className="flex justify-end text-[11px] text-slate-500 dark:text-slate-500">
+                      <span>
+                        {formatTime(question.createdAt) &&
+                          `Sent ${formatTime(question.createdAt)}`}
+                        {formatTime(question.createdAt) &&
+                          formatTime((question as any).answeredAt) &&
+                          " • "}
+                        {formatTime((question as any).answeredAt) &&
+                          `Replied ${formatTime((question as any).answeredAt)}`}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 <ReactionBar
                   questionId={question.id}
@@ -447,9 +474,15 @@ export function ProfilePageClient(props: Props) {
               </Card>
             ))}
           </StaggerContainer>
-        </section>
+        </motion.section>
 
-        <section className="space-y-3">
+        <motion.section
+          className="space-y-3"
+          initial={{ opacity: 0, y: 8 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration, ease: "easeOut" }}
+        >
           <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
             Published polls
           </h2>
@@ -500,7 +533,7 @@ export function ProfilePageClient(props: Props) {
               </Card>
             ))}
           </StaggerContainer>
-        </section>
+        </motion.section>
       </div>
     </main>
   );

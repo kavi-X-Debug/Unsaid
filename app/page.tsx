@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { useAuth } from "@/components/auth/auth-provider";
 
 type Testimonial = {
@@ -56,10 +57,17 @@ export default function LandingPage() {
   const { user, loading } = useAuth();
   const showAuthButtons = !loading && !user;
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const prefersReducedMotion = useReducedMotion();
+  const sectionDuration = prefersReducedMotion ? 0 : 0.4;
 
   return (
     <main className="min-h-screen flex flex-col bg-gradient-to-b from-slate-50 via-slate-50 to-slate-100 dark:from-slate-950 dark:via-slate-950 dark:to-black">
-      <section className="flex-1 w-full">
+      <motion.section
+        className="flex-1 w-full"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: sectionDuration, ease: "easeOut" }}
+      >
         <div className="mx-auto max-w-6xl px-4 py-12 md:py-16 lg:py-20 flex flex-col gap-10 md:grid md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:items-center">
           <div className="space-y-5 max-w-xl">
             <p className="text-[11px] uppercase tracking-[0.18em] text-sky-400/80">
@@ -151,8 +159,14 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-      </section>
-      <section className="border-t border-slate-200 bg-slate-50 dark:border-slate-800/60 dark:bg-slate-950/60">
+      </motion.section>
+      <motion.section
+        className="border-t border-slate-200 bg-slate-50 dark:border-slate-800/60 dark:bg-slate-950/60"
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: sectionDuration, ease: "easeOut" }}
+      >
         <div className="mx-auto max-w-5xl px-4 py-10 space-y-10">
           <div className="text-center space-y-2">
             <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
@@ -218,8 +232,14 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-      </section>
-      <section className="border-t border-slate-900/70 bg-black/90">
+      </motion.section>
+      <motion.section
+        className="border-t border-slate-900/70 bg-black/90"
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: sectionDuration, ease: "easeOut" }}
+      >
         <div className="mx-auto max-w-5xl px-4 py-12 space-y-8">
           <div className="text-center space-y-2">
             <h2 className="text-xl font-semibold text-slate-100">
@@ -295,7 +315,7 @@ export default function LandingPage() {
             </div>
           )}
         </div>
-      </section>
+      </motion.section>
     </main>
   );
 }

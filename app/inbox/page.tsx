@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   collection,
   deleteDoc,
@@ -91,6 +91,8 @@ export default function InboxPage() {
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [copyMessage, setCopyMessage] = useState<string | null>(null);
   const [pollSelections, setPollSelections] = useState<Record<string, number | null>>({});
+  const prefersReducedMotion = useReducedMotion();
+  const sectionDuration = prefersReducedMotion ? 0 : 0.3;
 
   useEffect(() => {
     if (loading) {
@@ -300,13 +302,22 @@ export default function InboxPage() {
     }
     await updateDoc(doc(db, "questions", id), {
       answerText: answer,
-      isAnswered: true
+      isAnswered: true,
+      answeredAt: serverTimestamp()
     });
     setAnswerDrafts(previous => {
       const next = { ...previous };
       delete next[id];
       return next;
     });
+  };
+
+  const formatTime = (timestamp: any) => {
+    if (!timestamp?.toDate) {
+      return "";
+    }
+    const date = timestamp.toDate() as Date;
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
   const publishPoll = async (id: string) => {
@@ -335,6 +346,8 @@ export default function InboxPage() {
       const hasAnyReactions =
         reactionCounts.heart > 0 || reactionCounts.laugh > 0 || reactionCounts.wow > 0;
       const isSelected = selectedIds.has(item.id);
+      const sentTime = formatTime(question.createdAt);
+      const repliedTime = formatTime((question as any).answeredAt);
       return (
         <motion.div
           key={item.id}
@@ -359,6 +372,15 @@ export default function InboxPage() {
                   <p className="text-sm text-slate-800 dark:text-slate-300 whitespace-pre-wrap">
                     {question.answerText}
                   </p>
+                )}
+                {(sentTime || repliedTime) && (
+                  <div className="flex justify-end text-[11px] text-slate-500 dark:text-slate-500">
+                    <span>
+                      {sentTime && `Sent ${sentTime}`}
+                      {sentTime && repliedTime && " • "}
+                      {repliedTime && `Replied ${repliedTime}`}
+                    </span>
+                  </div>
                 )}
                 {question.isAnswered && hasAnyReactions && (
                   <div className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-400">
@@ -553,7 +575,12 @@ export default function InboxPage() {
           </Button>
         </div>
       </Modal>
-      <div className="w-full max-w-3xl space-y-6 rounded-2xl border border-slate-200 bg-white/95 px-5 py-6 shadow-[0_18px_45px_rgba(15,23,42,0.15)] backdrop-blur dark:border-slate-800/70 dark:bg-slate-950/60 dark:shadow-[0_18px_45px_rgba(15,23,42,0.85)]">
+      <motion.div
+        className="w-full max-w-3xl space-y-6 rounded-2xl border border-slate-200 bg-white/95 px-5 py-6 shadow-[0_18px_45px_rgba(15,23,42,0.15)] backdrop-blur dark:border-slate-800/70 dark:bg-slate-950/60 dark:shadow-[0_18px_45px_rgba(15,23,42,0.85)]"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: sectionDuration, ease: "easeOut" }}
+      >
         <header className="flex items-center justify-between gap-4">
           <div>
             <p className="text-[11px] uppercase tracking-[0.18em] text-sky-400/80 mb-1">
@@ -571,7 +598,13 @@ export default function InboxPage() {
           </div>
         </header>
 
-        <section className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <motion.section
+          className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+          initial={{ opacity: 0, y: 8 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: sectionDuration, ease: "easeOut" }}
+        >
           <Card className="p-3 border border-sky-200 bg-sky-50 dark:border-sky-500/40 dark:bg-sky-500/10">
             <p className="text-[11px] uppercase tracking-wide text-sky-700 dark:text-sky-200">
               New
@@ -588,10 +621,15 @@ export default function InboxPage() {
               {grouped.answered.length}
             </p>
           </Card>
-        </section>
+        </motion.section>
 
         {shareUrl && (
-          <section>
+          <motion.section
+            initial={{ opacity: 0, y: 8 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: sectionDuration, ease: "easeOut" }}
+          >
             <Card className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 border border-slate-200 bg-white dark:border-slate-800/70 dark:bg-slate-900/60">
               <div className="text-xs text-slate-700 dark:text-slate-400">
                 Share this link so people can send you anonymous messages:
@@ -622,10 +660,15 @@ export default function InboxPage() {
                 )}
               </div>
             </Card>
-          </section>
+          </motion.section>
         )}
 
-        <section>
+        <motion.section
+          initial={{ opacity: 0, y: 8 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: sectionDuration, ease: "easeOut" }}
+        >
           <Card className="flex flex-col gap-3 p-3 border border-slate-200 bg-white sm:flex-row sm:items-center sm:justify-between dark:border-slate-800/70 dark:bg-slate-900/60">
             <Input
               placeholder="Search by keyword"
@@ -646,7 +689,7 @@ export default function InboxPage() {
               </div>
             )}
           </Card>
-        </section>
+        </motion.section>
 
         <Tabs
           tabs={[
@@ -656,7 +699,7 @@ export default function InboxPage() {
           initialKey="new"
           renderContent={renderTabContent}
         />
-      </div>
+      </motion.div>
     </main>
   );
 }

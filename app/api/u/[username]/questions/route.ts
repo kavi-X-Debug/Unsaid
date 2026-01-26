@@ -29,7 +29,10 @@ export async function POST(request: NextRequest, context: { params: { username: 
     const ip = forwarded.split(",")[0]?.trim() ?? "";
     const allowed = await checkAnonymousRateLimit(ip, toUserId);
     if (!allowed) {
-      return NextResponse.json({ error: "Too many submissions. Try again later." }, { status: 429 });
+      return NextResponse.json(
+        { error: "Too many submissions. Try again later." },
+        { status: 429 }
+      );
     }
     await addDoc(collection(db, "questions"), {
       toUserId,
@@ -38,6 +41,7 @@ export async function POST(request: NextRequest, context: { params: { username: 
       isAnswered: false,
       isReported: false,
       createdAt: serverTimestamp(),
+      answeredAt: null,
       reactionCounts: {
         heart: 0,
         laugh: 0,
