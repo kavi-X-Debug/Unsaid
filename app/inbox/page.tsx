@@ -100,7 +100,10 @@ export default function InboxPage() {
       router.push("/login");
       return;
     }
-    if (!user.emailVerified) {
+    const hasPasswordProvider = user.providerData.some(
+      provider => provider.providerId === "password"
+    );
+    if (hasPasswordProvider && !user.emailVerified) {
       router.push("/verify-email");
     }
   }, [user, loading, router]);

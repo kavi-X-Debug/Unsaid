@@ -244,9 +244,28 @@ export default function SignupPage() {
                 "Connecting to Google..."
               ) : (
                 <>
-                  <span className="mr-2 inline-flex h-4 w-4 items-center justify-center rounded-sm bg-white">
-                    <span className="inline-block h-2 w-2 bg-[#4285F4]" />
-                  </span>
+                  <svg
+                    className="mr-2 h-4 w-4"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fill="#EA4335"
+                      d="M12 10.2v3.9h5.5c-.2 1.3-.9 2.4-2 3.1l3.2 2.5c1.9-1.8 3-4.5 3-7.6 0-.7-.1-1.4-.2-2H12z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M6.6 14.3l-.9.7-2.6 2c1.6 3.1 4.7 5.1 8.9 5.1 2.7 0 5-.9 6.7-2.5l-3.2-2.5c-.9.6-2 1-3.5 1-2.7 0-5-1.8-5.8-4.3z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M3.1 7.1C2.4 8.5 2 10 2 11.6c0 1.6.4 3.1 1.1 4.5l3.5-2.8c-.2-.6-.3-1.2-.3-1.8 0-.6.1-1.2.3-1.8z"
+                    />
+                    <path
+                      fill="#4285F4"
+                      d="M12 4.5c1.5 0 2.8.5 3.8 1.5l2.8-2.8C17 1.7 14.7.8 12 .8 7.8.8 4.7 2.8 3.1 7.1l3.5 2.8C7.1 7.3 9.3 4.5 12 4.5z"
+                    />
+                  </svg>
                   <span>Continue with Google</span>
                 </>
               )}

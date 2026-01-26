@@ -29,7 +29,12 @@ export function AuthProvider(props: Props) {
     return () => unsub();
   }, []);
 
-  const isVerified = !!user?.emailVerified;
+  const isVerified =
+    user == null
+      ? false
+      : user.providerData.some(provider => provider.providerId === "password")
+        ? !!user.emailVerified
+        : true;
 
   return (
     <AuthContext.Provider value={{ user, loading, isVerified }}>
