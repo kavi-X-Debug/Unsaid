@@ -77,7 +77,7 @@ export function Navbar() {
             <Image src={logo} alt="Unsaid" fill sizes="28px" className="object-cover" />
           </div>
           <span
-            className={`${logoFont.className} text-2xl font-semibold tracking-[0.28em] text-slate-800 dark:text-slate-100`}
+            className={`${logoFont.className} text-xl font-semibold tracking-[0.28em] text-slate-800 dark:text-slate-100`}
           >
             UnSaid
           </span>

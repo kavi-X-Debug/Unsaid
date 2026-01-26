@@ -333,41 +333,41 @@ export default function InboxPage() {
           transition={{ duration: 0.18, ease: "easeOut" }}
           whileHover={{ y: -2 }}
         >
-          <Card className="p-4 space-y-3 border border-slate-800/70 bg-slate-900/50 hover:border-sky-500/70 hover:bg-slate-900/90 transition-colors">
+          <Card className="p-4 space-y-3 border border-slate-200 bg-white hover:border-sky-500/60 hover:bg-slate-50 transition-colors dark:border-slate-800/70 dark:bg-slate-900/50 dark:hover:border-sky-500/70 dark:hover:bg-slate-900/90">
             <div className="flex items-start gap-2">
               <input
                 type="checkbox"
-                className="mt-1 h-4 w-4 rounded border-slate-700 bg-slate-900"
+                className="mt-1 h-4 w-4 rounded border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-900"
                 checked={isSelected}
                 onChange={() => toggleSelect(item.id)}
               />
               <div className="flex-1 space-y-2">
-                <p className="text-sm text-slate-100 whitespace-pre-wrap">
+                <p className="text-sm text-slate-900 dark:text-slate-100 whitespace-pre-wrap">
                   {question.questionText}
                 </p>
                 {question.isAnswered && question.answerText && (
-                  <p className="text-sm text-slate-300 whitespace-pre-wrap">
+                  <p className="text-sm text-slate-800 dark:text-slate-300 whitespace-pre-wrap">
                     {question.answerText}
                   </p>
                 )}
                 {question.isAnswered && question.reactionCounts && (
-                  <div className="flex items-center gap-2 text-xs text-slate-400">
+                  <div className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-400">
                     <span>Reactions:</span>
                     <div className="flex gap-1 flex-wrap">
                       {question.reactionCounts.heart > 0 && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-900/60 px-2 py-0.5">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-800 border border-slate-200 px-2 py-0.5 dark:bg-slate-900/60 dark:text-slate-300 dark:border-slate-700">
                           <span>❤️</span>
                           <span>{question.reactionCounts.heart}</span>
                         </span>
                       )}
                       {question.reactionCounts.laugh > 0 && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-900/60 px-2 py-0.5">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-800 border border-slate-200 px-2 py-0.5 dark:bg-slate-900/60 dark:text-slate-300 dark:border-slate-700">
                           <span>😂</span>
                           <span>{question.reactionCounts.laugh}</span>
                         </span>
                       )}
                       {question.reactionCounts.wow > 0 && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-900/60 px-2 py-0.5">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-800 border border-slate-200 px-2 py-0.5 dark:bg-slate-900/60 dark:text-slate-300 dark:border-slate-700">
                           <span>😮</span>
                           <span>{question.reactionCounts.wow}</span>
                         </span>
@@ -419,16 +419,16 @@ export default function InboxPage() {
         transition={{ duration: 0.18, ease: "easeOut" }}
         whileHover={{ y: -2 }}
       >
-        <Card className="p-4 space-y-3 border border-slate-800/70 bg-slate-900/50 hover:border-sky-500/70 hover:bg-slate-900/90 transition-colors">
+        <Card className="p-4 space-y-3 border border-slate-200 bg-white hover:border-sky-500/60 hover:bg-slate-50 transition-colors dark:border-slate-800/70 dark:bg-slate-900/50 dark:hover:border-sky-500/70 dark:hover:bg-slate-900/90">
           <div className="flex items-start gap-2">
             <input
               type="checkbox"
-              className="mt-1 h-4 w-4 rounded border-slate-700 bg-slate-900"
+              className="mt-1 h-4 w-4 rounded border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-900"
               checked={isSelected}
               onChange={() => toggleSelect(item.id)}
             />
             <div className="flex-1 space-y-2">
-              <p className="text-sm text-slate-100 whitespace-pre-wrap">
+              <p className="text-sm text-slate-900 dark:text-slate-100 whitespace-pre-wrap">
                 {questionText ?? "Poll"}
               </p>
               <div className="space-y-1 text-xs">
@@ -447,8 +447,8 @@ export default function InboxPage() {
                       }
                       className={`w-full text-left rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150 ${
                         isSelectedOption
-                          ? "bg-sky-500/15 text-sky-300 border border-sky-500/70"
-                          : "bg-slate-900/40 text-slate-300 border border-slate-700/70 hover:border-sky-500/60 hover:text-sky-300"
+                          ? "bg-sky-100 text-slate-900 border border-sky-500/70 dark:bg-sky-500/15 dark:text-sky-300"
+                          : "bg-slate-100 text-slate-800 border border-slate-300 hover:border-sky-500/60 hover:text-sky-700 dark:bg-slate-900/40 dark:text-slate-300 dark:border-slate-700/70 dark:hover:border-sky-500/60 dark:hover:text-sky-300"
                       }`}
                     >
                       {option.optionText}
@@ -477,7 +477,7 @@ export default function InboxPage() {
     if (key === "new") {
       if (grouped.newItems.length === 0) {
         return (
-          <Card className="p-4 text-sm text-slate-300 border border-dashed border-slate-700/70 bg-slate-900/40 flex items-center justify-center">
+          <Card className="p-4 text-sm text-slate-900 border border-dashed border-slate-300 bg-white flex items-center justify-center dark:text-slate-300 dark:border-slate-700/70 dark:bg-slate-900/40">
             Nothing new yet.
           </Card>
         );
@@ -487,7 +487,7 @@ export default function InboxPage() {
     if (key === "answered") {
       if (grouped.answered.length === 0) {
         return (
-          <Card className="p-4 text-sm text-slate-300 border border-dashed border-slate-700/70 bg-slate-900/40 flex items-center justify-center">
+          <Card className="p-4 text-sm text-slate-900 border border-dashed border-slate-300 bg-white flex items-center justify-center dark:text-slate-300 dark:border-slate-700/70 dark:bg-slate-900/40">
             No answered items yet.
           </Card>
         );
@@ -502,7 +502,7 @@ export default function InboxPage() {
       <main className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <LoadingAnimation />
-          <p className="text-slate-500 dark:text-slate-400">Loading inbox...</p>
+          <p className="text-slate-900 dark:text-slate-400">Loading inbox...</p>
         </div>
       </main>
     );
@@ -542,7 +542,7 @@ export default function InboxPage() {
           </Button>
         </div>
       </Modal>
-      <div className="w-full max-w-3xl space-y-6 rounded-2xl border border-slate-800/70 bg-slate-950/60 px-5 py-6 shadow-[0_18px_45px_rgba(15,23,42,0.85)] backdrop-blur">
+      <div className="w-full max-w-3xl space-y-6 rounded-2xl border border-slate-200 bg-white/95 px-5 py-6 shadow-[0_18px_45px_rgba(15,23,42,0.15)] backdrop-blur dark:border-slate-800/70 dark:bg-slate-950/60 dark:shadow-[0_18px_45px_rgba(15,23,42,0.85)]">
         <header className="flex items-center justify-between gap-4">
           <div>
             <p className="text-[11px] uppercase tracking-[0.18em] text-sky-400/80 mb-1">
@@ -551,26 +551,26 @@ export default function InboxPage() {
             <h1 className="text-2xl font-semibold bg-gradient-to-r from-sky-400 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
               Smart inbox
             </h1>
-            <p className="mt-1 text-xs text-slate-400">
+            <p className="mt-1 text-xs text-slate-700 dark:text-slate-400">
               Manage your anonymous questions and polls in one place.
             </p>
           </div>
         </header>
 
         <section className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Card className="p-3 border border-sky-500/40 bg-sky-500/10">
-            <p className="text-[11px] uppercase tracking-wide text-sky-200">
+          <Card className="p-3 border border-sky-200 bg-sky-50 dark:border-sky-500/40 dark:bg-sky-500/10">
+            <p className="text-[11px] uppercase tracking-wide text-sky-700 dark:text-sky-200">
               New
             </p>
-            <p className="mt-1 text-lg font-semibold text-sky-50">
+            <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-sky-50">
               {grouped.newItems.length}
             </p>
           </Card>
-          <Card className="p-3 border border-violet-500/40 bg-violet-500/10">
-            <p className="text-[11px] uppercase tracking-wide text-violet-200">
+          <Card className="p-3 border border-violet-200 bg-violet-50 dark:border-violet-500/40 dark:bg-violet-500/10">
+            <p className="text-[11px] uppercase tracking-wide text-violet-700 dark:text-violet-200">
               Answered
             </p>
-            <p className="mt-1 text-lg font-semibold text-violet-50">
+            <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-violet-50">
               {grouped.answered.length}
             </p>
           </Card>
@@ -578,10 +578,10 @@ export default function InboxPage() {
 
         {shareUrl && (
           <section>
-            <Card className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 border border-slate-800/70 bg-slate-900/60">
-              <div className="text-xs text-slate-400">
+            <Card className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 border border-slate-200 bg-white dark:border-slate-800/70 dark:bg-slate-900/60">
+              <div className="text-xs text-slate-700 dark:text-slate-400">
                 Share this link so people can send you anonymous messages:
-                <p className="mt-1 text-slate-100 break-all">
+                <p className="mt-1 text-slate-900 dark:text-slate-100 break-all">
                   {shareUrl}
                 </p>
               </div>
@@ -602,7 +602,7 @@ export default function InboxPage() {
                   Copy link
                 </Button>
                 {copyMessage && (
-                  <p className="text-[11px] text-emerald-400">
+                  <p className="text-[11px] text-emerald-500 dark:text-emerald-400">
                     {copyMessage}
                   </p>
                 )}
@@ -612,7 +612,7 @@ export default function InboxPage() {
         )}
 
         <section>
-          <Card className="flex flex-col gap-3 p-3 border border-slate-800/70 bg-slate-900/60 sm:flex-row sm:items-center sm:justify-between">
+          <Card className="flex flex-col gap-3 p-3 border border-slate-200 bg-white sm:flex-row sm:items-center sm:justify-between dark:border-slate-800/70 dark:bg-slate-900/60">
             <Input
               placeholder="Search by keyword"
               value={search}
@@ -620,7 +620,7 @@ export default function InboxPage() {
             />
             {selectedIds.size > 0 && (
               <div className="flex flex-wrap items-center gap-2 text-xs sm:justify-end">
-                <span className="text-slate-300">
+                <span className="text-slate-900 dark:text-slate-300">
                   {selectedIds.size} selected
                 </span>
                 <Button variant="ghost" type="button" onClick={clearSelection}>
