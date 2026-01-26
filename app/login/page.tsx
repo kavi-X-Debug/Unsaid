@@ -127,12 +127,6 @@ export default function LoginPage() {
       const provider = new FacebookAuthProvider();
       const credential = await signInWithPopup(auth, provider);
       if (credential.user) {
-        if (!credential.user.emailVerified) {
-          await sendEmailVerification(credential.user);
-          setError("Please verify your email before logging in.");
-          setMessage("We sent a verification link to your email. Please check your inbox.");
-          return;
-        }
         await ensureUserProfile(credential.user);
         router.push("/inbox");
       }
