@@ -554,6 +554,9 @@ export default function InboxPage() {
             <p className="mt-1 text-xs text-slate-700 dark:text-slate-400">
               Manage your anonymous questions and polls in one place.
             </p>
+            <p className="mt-1 text-[11px] text-slate-700 dark:text-slate-500">
+              You can customize your profile from the Profile page.
+            </p>
           </div>
         </header>
 

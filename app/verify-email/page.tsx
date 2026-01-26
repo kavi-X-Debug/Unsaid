@@ -58,7 +58,7 @@ export default function VerifyEmailPage() {
     setMessage(null);
     try {
       await sendEmailVerification(user);
-      setMessage("Verification email resent. Please check your inbox.");
+      setMessage("Verification email resent. Please check your inbox and spam folder.");
     } catch {
       setError("Could not resend verification email. Please try again later.");
     } finally {
@@ -83,7 +83,7 @@ export default function VerifyEmailPage() {
               <p className="text-sm text-slate-600 dark:text-slate-300">
                 We sent a verification email to
                 <span className="font-medium"> {email}</span>. Click the link in that email to
-                activate your account.
+                activate your account. If you do not see it, check your spam folder.
               </p>
               <Button type="button" fullWidth disabled={sending} onClick={handleResend}>
                 {sending ? "Sending..." : "Resend verification email"}
