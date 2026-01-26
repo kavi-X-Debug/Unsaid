@@ -84,7 +84,7 @@ export default function LandingPage() {
                 You decide what goes public.
               </span>
             </h1>
-            <p className="text-sm md:text-base text-slate-300">
+            <p className="text-sm md:text-base text-slate-900 dark:text-slate-300">
               Unsaid gives you a simple link where friends, followers, and communities
               can send anonymous questions and polls. You answer from a private inbox
               with reactions and safety tools built in.
@@ -105,56 +105,56 @@ export default function LandingPage() {
                 </Link>
               </div>
             )}
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px] text-slate-700 dark:text-slate-500">
               No one sees who asked. You control what gets published.
             </p>
           </div>
           <div className="relative">
-            <div className="absolute inset-0 -z-10 rounded-3xl bg-sky-500/20 blur-3xl opacity-60" />
-            <div className="rounded-3xl border border-slate-800 bg-slate-950/70 shadow-xl shadow-sky-500/20 p-4 space-y-4">
-              <div className="flex items-center justify-between text-xs text-slate-400">
+            <div className="absolute inset-0 -z-10 rounded-3xl bg-sky-300/30 blur-3xl opacity-70 dark:bg-sky-500/20" />
+            <div className="rounded-3xl border border-slate-200 bg-white shadow-xl shadow-sky-500/10 p-4 space-y-4 dark:border-slate-800 dark:bg-slate-950/70 dark:shadow-sky-500/20">
+              <div className="flex items-center justify-between text-xs text-slate-700 dark:text-slate-400">
                 <span className="inline-flex items-center gap-1">
                   <span className="h-2 w-2 rounded-full bg-emerald-400" />
                   Inbox
                 </span>
-                <span className="text-[10px] text-slate-500">New questions</span>
+                <span className="text-[10px] text-slate-600 dark:text-slate-500">New questions</span>
               </div>
               <div className="space-y-3 text-xs">
-                <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-3 space-y-2">
-                  <p className="text-slate-100">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 space-y-2 dark:border-slate-800 dark:bg-slate-900/80">
+                  <p className="text-slate-900 dark:text-slate-100">
                     What is something you wish more people understood about you?
                   </p>
-                  <p className="text-slate-400">
+                  <p className="text-slate-700 dark:text-slate-400">
                     Answer privately, then decide if you want to publish it.
                   </p>
                 </div>
-                <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-3 space-y-2">
-                  <p className="text-slate-100">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 space-y-2 dark:border-slate-800 dark:bg-slate-900/80">
+                  <p className="text-slate-900 dark:text-slate-100">
                     Poll: Should I start a weekly Q&amp;A series?
                   </p>
                   <div className="grid gap-1">
-                    <div className="flex items-center justify-between rounded-full bg-slate-800 px-3 py-1">
-                      <span className="text-slate-100 text-[11px]">Yes, sounds fun</span>
-                      <span className="text-slate-400 text-[10px]">68%</span>
+                    <div className="flex items-center justify-between rounded-full bg-slate-200 px-3 py-1 dark:bg-slate-800">
+                      <span className="text-slate-900 text-[11px] dark:text-slate-100">Yes, sounds fun</span>
+                      <span className="text-slate-700 text-[10px] dark:text-slate-400">68%</span>
                     </div>
-                    <div className="flex items-center justify-between rounded-full bg-slate-900 px-3 py-1">
-                      <span className="text-slate-100 text-[11px]">Maybe, sometimes</span>
-                      <span className="text-slate-400 text-[10px]">24%</span>
+                    <div className="flex items-center justify-between rounded-full bg-slate-200 px-3 py-1 dark:bg-slate-900">
+                      <span className="text-slate-900 text-[11px] dark:text-slate-100">Maybe, sometimes</span>
+                      <span className="text-slate-700 text-[10px] dark:text-slate-400">24%</span>
                     </div>
-                    <div className="flex items-center justify-between rounded-full bg-slate-900 px-3 py-1">
-                      <span className="text-slate-100 text-[11px]">Not really</span>
-                      <span className="text-slate-400 text-[10px]">8%</span>
+                    <div className="flex items-center justify-between rounded-full bg-slate-200 px-3 py-1 dark:bg-slate-900">
+                      <span className="text-slate-900 text-[11px] dark:text-slate-100">Not really</span>
+                      <span className="text-slate-700 text-[10px] dark:text-slate-400">8%</span>
                     </div>
                   </div>
                 </div>
-                <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-3 flex items-center justify-between">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 flex items-center justify-between dark:border-slate-800 dark:bg-slate-900/80">
                   <div className="space-y-1">
-                    <p className="text-[11px] text-slate-400">Share your link</p>
-                    <p className="text-[11px] text-slate-100 truncate max-w-[200px]">
+                    <p className="text-[11px] text-slate-700 dark:text-slate-400">Share your link</p>
+                    <p className="text-[11px] text-slate-900 truncate max-w-[200px] dark:text-slate-100">
                       unsaid.app/yourname
                     </p>
                   </div>
-                  <span className="inline-flex items-center justify-center rounded-full bg-sky-500/10 text-sky-400 text-[11px] px-3 py-1 border border-sky-500/40">
+                  <span className="inline-flex items-center justify-center rounded-full bg-sky-100 text-sky-700 text-[11px] px-3 py-1 border border-sky-300 dark:bg-sky-500/10 dark:text-sky-400 dark:border-sky-500/40">
                     Copy
                   </span>
                 </div>
@@ -163,34 +163,34 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      <section className="border-t border-slate-800/60 bg-slate-950/60">
+      <section className="border-t border-slate-200 bg-slate-50 dark:border-slate-800/60 dark:bg-slate-950/60">
         <div className="mx-auto max-w-5xl px-4 py-10 space-y-10">
           <div className="text-center space-y-2">
-            <h2 className="text-xl font-semibold text-slate-100">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
               Designed to feel simple from day one
             </h2>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-slate-700 dark:text-slate-400">
               Clear steps, a clean inbox, and tools that help you feel safe.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-3 text-left">
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 space-y-2">
-              <p className="text-sm font-semibold text-slate-100">Smart inbox</p>
-              <p className="text-xs text-slate-400">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-2 dark:border-slate-800 dark:bg-slate-900/70">
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Smart inbox</p>
+              <p className="text-xs text-slate-700 dark:text-slate-400">
                 New questions and polls are grouped together so you always know what
                 needs your attention.
               </p>
             </div>
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 space-y-2">
-              <p className="text-sm font-semibold text-slate-100">Safety first</p>
-              <p className="text-xs text-slate-400">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-2 dark:border-slate-800 dark:bg-slate-900/70">
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Safety first</p>
+              <p className="text-xs text-slate-700 dark:text-slate-400">
                 Report anything that crosses the line and keep full control of what is
                 shown on your public profile.
               </p>
             </div>
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 space-y-2">
-              <p className="text-sm font-semibold text-slate-100">Quick reactions</p>
-              <p className="text-xs text-slate-400">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-2 dark:border-slate-800 dark:bg-slate-900/70">
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Quick reactions</p>
+              <p className="text-xs text-slate-700 dark:text-slate-400">
                 Let people tap a reaction instead of writing another message, so
                 feedback stays light and fun.
               </p>
@@ -198,30 +198,30 @@ export default function LandingPage() {
           </div>
           <div className="grid gap-8 md:grid-cols-2 items-start">
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-slate-100">
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                 Get started in three simple steps
               </h3>
-              <ol className="space-y-2 text-xs text-slate-400">
+              <ol className="space-y-2 text-xs text-slate-700 dark:text-slate-400">
                 <li>
-                  <span className="font-semibold text-slate-100">1. Create your profile.</span>{" "}
+                  <span className="font-semibold text-slate-900 dark:text-slate-100">1. Create your profile.</span>{" "}
                   Sign up in seconds and get your own Unsaid link.
                 </li>
                 <li>
-                  <span className="font-semibold text-slate-100">2. Share your link.</span>{" "}
+                  <span className="font-semibold text-slate-900 dark:text-slate-100">2. Share your link.</span>{" "}
                   Post it on socials, stories, or send it directly to friends.
                 </li>
                 <li>
-                  <span className="font-semibold text-slate-100">3. Answer from your inbox.</span>{" "}
+                  <span className="font-semibold text-slate-900 dark:text-slate-100">3. Answer from your inbox.</span>{" "}
                   Read questions privately, choose what to answer, and publish when you
                   are ready.
                 </li>
               </ol>
             </div>
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-slate-100">
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                 Great for many kinds of people
               </h3>
-              <ul className="space-y-1 text-xs text-slate-400">
+              <ul className="space-y-1 text-xs text-slate-700 dark:text-slate-400">
                 <li>Creators who want honest feedback without DMs getting messy.</li>
                 <li>Friends who want to ask things they are shy to say out loud.</li>
                 <li>Communities that need quick anonymous polls and questions.</li>
@@ -230,7 +230,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      <section className="border-t border-slate-800/60 bg-black/90">
+      <section className="border-t border-slate-900/70 bg-black/90">
         <div className="mx-auto max-w-5xl px-4 py-12 space-y-8">
           <div className="text-center space-y-2">
             <h2 className="text-xl font-semibold text-slate-100">

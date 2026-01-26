@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { sendEmailVerification, signOut } from "firebase/auth";
+import { reload, sendEmailVerification, signOut } from "firebase/auth";
 import { auth } from "../../lib/firebase";
 import { useAuth } from "../../components/auth/auth-provider";
 import { Card } from "../../components/ui/card";
@@ -23,6 +23,30 @@ export default function VerifyEmailPage() {
     if (user && isVerified) {
       router.push("/inbox");
     }
+  }, [user, isVerified, loading, router]);
+
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
+    if (!user || isVerified) {
+      return;
+    }
+    let cancelled = false;
+    const intervalId = setInterval(async () => {
+      try {
+        await reload(user);
+        if (!cancelled && user.emailVerified) {
+          setMessage("Email verified. Redirecting to your inbox...");
+          router.push("/inbox");
+        }
+      } catch {
+      }
+    }, 5000);
+    return () => {
+      cancelled = true;
+      clearInterval(intervalId);
+    };
   }, [user, isVerified, loading, router]);
 
   const handleResend = async () => {
@@ -100,4 +124,3 @@ export default function VerifyEmailPage() {
     </main>
   );
 }
-
