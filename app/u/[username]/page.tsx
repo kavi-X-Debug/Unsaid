@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ProfilePageClient } from "./profile-client";
 import { db } from "@/lib/firebase";
 import type { AppUser, Question, Poll } from "@/lib/types";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, doc, getDocs, query, updateDoc, where, increment } from "firebase/firestore";
 
 type Props = {
   params: {
@@ -46,7 +46,8 @@ export default async function UserProfilePage(props: Props) {
     );
   }
 
-  const userData = userSnapshot.docs[0].data() as AppUser;
+  const userDoc = userSnapshot.docs[0];
+  const userData = userDoc.data() as AppUser;
   const userId = userData.uid;
 
   const questionsSnapshot = await getDocs(
@@ -89,12 +90,19 @@ export default async function UserProfilePage(props: Props) {
     return bDate - aDate;
   });
 
+  const currentViews = (userData as any).profileViews ?? 0;
   const stats = {
     totalQuestions,
     totalAnswered: answeredQuestions.length,
     totalPolls: publishedPolls.length,
-    totalViews: (userData as any).profileViews ?? 0
+    totalViews: currentViews + 1
   };
+
+  try {
+    const userRef = doc(db, "users", userDoc.id);
+    await updateDoc(userRef, { profileViews: increment(1) });
+  } catch {
+  }
 
   return (
     <ProfilePageClient

@@ -5,12 +5,17 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { Rubik_Doodle_Shadow } from "next/font/google";
+import { Rubik_Doodle_Shadow, Lovers_Quarrel } from "next/font/google";
 import { useAuth } from "../auth/auth-provider";
 import { db } from "../../lib/firebase";
 import logo from "../../icon.jpg";
 
 const logoFont = Rubik_Doodle_Shadow({
+  subsets: ["latin"],
+  weight: "400"
+});
+
+const scriptFont = Lovers_Quarrel({
   subsets: ["latin"],
   weight: "400"
 });
@@ -76,10 +81,13 @@ export function Navbar() {
           <div className="relative h-7 w-7 overflow-hidden rounded-full border border-slate-300 dark:border-slate-700">
             <Image src={logo} alt="Unsaid" fill sizes="28px" className="object-cover" />
           </div>
-          <span
-            className={`${logoFont.className} text-xl font-semibold tracking-[0.28em] text-slate-800 dark:text-slate-100`}
-          >
-            UnSaid
+          <span className="flex items-baseline gap-1 text-xl font-semibold text-slate-800 dark:text-slate-100">
+            <span className={`${scriptFont.className} tracking-normal leading-none`}>
+              Un
+            </span>
+            <span className={`${logoFont.className} tracking-[0.28em] leading-none`}>
+              Said
+            </span>
           </span>
         </Link>
         <div className="flex items-center gap-1 rounded-full bg-slate-100 px-1 py-0.5 text-xs border border-slate-200 dark:bg-slate-900/80 dark:border-slate-800 max-w-full overflow-x-auto">

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
 
 type Testimonial = {
@@ -56,17 +56,6 @@ export default function LandingPage() {
   const { user, loading } = useAuth();
   const showAuthButtons = !loading && !user;
   const [activeTestimonial, setActiveTestimonial] = useState(0);
-
-  useEffect(() => {
-    if (!testimonials.length) {
-      return;
-    }
-    const interval = setInterval(() => {
-      setActiveTestimonial(previous => (previous + 1) % testimonials.length);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <main className="min-h-screen flex flex-col bg-gradient-to-b from-slate-50 via-slate-50 to-slate-100 dark:from-slate-950 dark:via-slate-950 dark:to-black">
@@ -240,35 +229,71 @@ export default function LandingPage() {
               A few made-up comments to show how feedback on Unsaid can look.
             </p>
           </div>
-          <div className="flex justify-center">
-            {testimonials.length > 0 && (
-              <div className="w-[260px] sm:w-[320px] rounded-2xl border border-slate-800 bg-slate-900/80 p-4 space-y-3">
-                <div className="flex items-center gap-3">
-                  <Image
-                    src={testimonials[activeTestimonial].image}
-                    alt={testimonials[activeTestimonial].name}
-                    width={48}
-                    height={48}
-                    className="h-12 w-12 rounded-full object-cover border border-slate-700"
-                  />
-                  <div className="space-y-0.5">
-                    <p className="text-sm font-semibold text-slate-100">
-                      {testimonials[activeTestimonial].name}
-                    </p>
-                    <p className="text-xs text-slate-400">
-                      {testimonials[activeTestimonial].handle}
-                    </p>
-                    <p className="text-[11px] text-slate-500">
-                      {testimonials[activeTestimonial].role}
-                    </p>
+          {testimonials.length > 0 && (
+            <div className="flex justify-center">
+              <div className="w-full max-w-xl space-y-4">
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <Image
+                      src={testimonials[activeTestimonial].image}
+                      alt={testimonials[activeTestimonial].name}
+                      width={48}
+                      height={48}
+                      className="h-12 w-12 rounded-full object-cover border border-slate-700"
+                    />
+                    <div className="space-y-0.5">
+                      <p className="text-sm font-semibold text-slate-100">
+                        {testimonials[activeTestimonial].name}
+                      </p>
+                      <p className="text-xs text-slate-400">
+                        {testimonials[activeTestimonial].handle}
+                      </p>
+                      <p className="text-[11px] text-slate-500">
+                        {testimonials[activeTestimonial].role}
+                      </p>
+                    </div>
                   </div>
+                  <p className="text-sm text-slate-200 leading-relaxed">
+                    “{testimonials[activeTestimonial].quote}”
+                  </p>
                 </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  “{testimonials[activeTestimonial].quote}”
-                </p>
+                <div className="flex gap-2 overflow-x-auto pb-1 justify-center">
+                  {testimonials.map((person, index) => {
+                    const isActive = index === activeTestimonial;
+                    const baseClasses =
+                      "flex items-center gap-2 rounded-full border px-3 py-1 text-xs whitespace-nowrap transition";
+                    const activeClasses =
+                      "border-sky-400 bg-sky-500/10 text-slate-50";
+                    const inactiveClasses =
+                      "border-slate-700 bg-slate-900/60 text-slate-400 hover:border-slate-500";
+                    const classes = [
+                      baseClasses,
+                      isActive ? activeClasses : inactiveClasses
+                    ].join(" ");
+                    return (
+                      <button
+                        key={person.handle}
+                        type="button"
+                        onClick={() => setActiveTestimonial(index)}
+                        className={classes}
+                      >
+                        <span className="inline-flex h-6 w-6 items-center justify-center overflow-hidden rounded-full border border-slate-700 bg-slate-800">
+                          <Image
+                            src={person.image}
+                            alt={person.name}
+                            width={24}
+                            height={24}
+                            className="h-6 w-6 object-cover"
+                          />
+                        </span>
+                        <span>{person.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </section>
     </main>
