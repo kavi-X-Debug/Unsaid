@@ -139,7 +139,7 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-slate-950 via-slate-950 to-black">
+    <main className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-slate-50 via-slate-50 to-slate-100 dark:from-slate-950 dark:via-slate-950 dark:to-black">
       <div className="max-w-md w-full space-y-6">
         <div className="text-center space-y-1">
           <p className="text-[11px] uppercase tracking-[0.18em] text-emerald-400/80">
@@ -148,7 +148,7 @@ export default function SignupPage() {
           <h1 className="text-3xl font-semibold tracking-tight bg-gradient-to-r from-emerald-400 via-sky-400 to-violet-400 bg-clip-text text-transparent">
             Create your Unsaid profile
           </h1>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-700 dark:text-slate-400">
             Start receiving anonymous questions and polls with your own profile link.
           </p>
         </div>
@@ -198,7 +198,7 @@ export default function SignupPage() {
               {loading ? "Creating account..." : "Sign up"}
             </Button>
           </form>
-          <div className="flex items-center gap-2 text-xs text-slate-500 pt-2 dark:text-slate-500">
+          <div className="flex items-center gap-2 text-xs text-slate-700 pt-2 dark:text-slate-500">
             <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
             <span>or</span>
             <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
@@ -213,7 +213,7 @@ export default function SignupPage() {
             {loadingGoogle ? "Connecting to Google..." : "Continue with Google"}
           </Button>
         </Card>
-        <p className="text-sm text-center text-slate-500 dark:text-slate-400">
+        <p className="text-sm text-center text-slate-700 dark:text-slate-400">
           Already have an account?{" "}
           <Link href="/login" className="text-sky-400 hover:text-sky-300">
             Log in

@@ -81,7 +81,7 @@ type InboxItem = {
 };
 
 export default function InboxPage() {
-  const { user, loading, isVerified } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
   const [items, setItems] = useState<InboxItem[]>([]);
   const [answerDrafts, setAnswerDrafts] = useState<Record<string, string>>({});
@@ -100,10 +100,10 @@ export default function InboxPage() {
       router.push("/login");
       return;
     }
-    if (!isVerified) {
+    if (!user.emailVerified) {
       router.push("/verify-email");
     }
-  }, [user, loading, isVerified, router]);
+  }, [user, loading, router]);
 
   useEffect(() => {
     if (!user?.uid) {
