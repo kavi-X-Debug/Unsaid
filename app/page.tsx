@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
 
 type Testimonial = {
@@ -56,27 +56,13 @@ export default function LandingPage() {
   const { user, loading } = useAuth();
   const showAuthButtons = !loading && !user;
   const [activeTestimonial, setActiveTestimonial] = useState(0);
-  const sliderRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!testimonials.length) {
       return;
     }
     const interval = setInterval(() => {
-      setActiveTestimonial(previous => {
-        const next = (previous + 1) % testimonials.length;
-        const container = sliderRef.current;
-        if (container) {
-          const child = container.children[next] as HTMLElement | undefined;
-          if (child) {
-            container.scrollTo({
-              left: child.offsetLeft,
-              behavior: "smooth"
-            });
-          }
-        }
-        return next;
-      });
+      setActiveTestimonial(previous => (previous + 1) % testimonials.length);
     }, 5000);
 
     return () => clearInterval(interval);
@@ -90,9 +76,11 @@ export default function LandingPage() {
             <p className="text-[11px] uppercase tracking-[0.18em] text-sky-400/80">
               Anonymous questions made safe
             </p>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight bg-gradient-to-r from-sky-400 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-              Let people ask anything.
-              <span className="block text-slate-100">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight">
+              <span className="bg-gradient-to-r from-sky-400 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+                Let people ask anything.
+              </span>
+              <span className="block text-slate-900 dark:text-slate-100">
                 You decide what goes public.
               </span>
             </h1>
@@ -111,7 +99,7 @@ export default function LandingPage() {
                 </Link>
                 <Link
                   href="/login"
-                  className="inline-flex items-center justify-center rounded-full border border-slate-300 px-6 py-3 text-sm font-medium text-slate-100 hover:bg-slate-900/80 transition dark:border-slate-700"
+                  className="inline-flex items-center justify-center rounded-full border border-slate-300 px-6 py-3 text-sm font-medium text-slate-900 hover:bg-slate-100 transition dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-900/80"
                 >
                   Log in
                 </Link>
@@ -252,36 +240,34 @@ export default function LandingPage() {
               A few made-up comments to show how feedback on Unsaid can look.
             </p>
           </div>
-          <div
-            ref={sliderRef}
-            className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory"
-          >
-            {testimonials.map((testimonial, index) => (
-              <div
-                key={testimonial.handle}
-                className="snap-center shrink-0 w-[260px] sm:w-[320px] rounded-2xl border border-slate-800 bg-slate-900/80 p-4 space-y-3"
-              >
+          <div className="flex justify-center">
+            {testimonials.length > 0 && (
+              <div className="w-[260px] sm:w-[320px] rounded-2xl border border-slate-800 bg-slate-900/80 p-4 space-y-3">
                 <div className="flex items-center gap-3">
                   <Image
-                    src={testimonial.image}
-                    alt={testimonial.name}
+                    src={testimonials[activeTestimonial].image}
+                    alt={testimonials[activeTestimonial].name}
                     width={48}
                     height={48}
                     className="h-12 w-12 rounded-full object-cover border border-slate-700"
                   />
                   <div className="space-y-0.5">
                     <p className="text-sm font-semibold text-slate-100">
-                      {testimonial.name}
+                      {testimonials[activeTestimonial].name}
                     </p>
-                    <p className="text-xs text-slate-400">{testimonial.handle}</p>
-                    <p className="text-[11px] text-slate-500">{testimonial.role}</p>
+                    <p className="text-xs text-slate-400">
+                      {testimonials[activeTestimonial].handle}
+                    </p>
+                    <p className="text-[11px] text-slate-500">
+                      {testimonials[activeTestimonial].role}
+                    </p>
                   </div>
                 </div>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  “{testimonial.quote}”
+                  “{testimonials[activeTestimonial].quote}”
                 </p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </section>
