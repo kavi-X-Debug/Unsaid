@@ -324,6 +324,13 @@ export default function InboxPage() {
   const renderItem = (item: InboxItem) => {
     if (item.type === "question") {
       const question = item.data as Question;
+      const reactionCounts = question.reactionCounts ?? {
+        heart: 0,
+        laugh: 0,
+        wow: 0
+      };
+      const hasAnyReactions =
+        reactionCounts.heart > 0 || reactionCounts.laugh > 0 || reactionCounts.wow > 0;
       const isSelected = selectedIds.has(item.id);
       return (
         <motion.div
@@ -350,26 +357,26 @@ export default function InboxPage() {
                     {question.answerText}
                   </p>
                 )}
-                {question.isAnswered && question.reactionCounts && (
+                {question.isAnswered && hasAnyReactions && (
                   <div className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-400">
                     <span>Reactions:</span>
                     <div className="flex gap-1 flex-wrap">
-                      {question.reactionCounts.heart > 0 && (
+                      {reactionCounts.heart > 0 && (
                         <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-800 border border-slate-200 px-2 py-0.5 dark:bg-slate-900/60 dark:text-slate-300 dark:border-slate-700">
                           <span>❤️</span>
-                          <span>{question.reactionCounts.heart}</span>
+                          <span>{reactionCounts.heart}</span>
                         </span>
                       )}
-                      {question.reactionCounts.laugh > 0 && (
+                      {reactionCounts.laugh > 0 && (
                         <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-800 border border-slate-200 px-2 py-0.5 dark:bg-slate-900/60 dark:text-slate-300 dark:border-slate-700">
                           <span>😂</span>
-                          <span>{question.reactionCounts.laugh}</span>
+                          <span>{reactionCounts.laugh}</span>
                         </span>
                       )}
-                      {question.reactionCounts.wow > 0 && (
+                      {reactionCounts.wow > 0 && (
                         <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-800 border border-slate-200 px-2 py-0.5 dark:bg-slate-900/60 dark:text-slate-300 dark:border-slate-700">
                           <span>😮</span>
-                          <span>{question.reactionCounts.wow}</span>
+                          <span>{reactionCounts.wow}</span>
                         </span>
                       )}
                     </div>
