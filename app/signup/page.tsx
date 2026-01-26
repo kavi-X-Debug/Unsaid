@@ -7,7 +7,6 @@ import { FirebaseError } from "firebase/app";
 import type { User } from "firebase/auth";
 import {
   GoogleAuthProvider,
-  FacebookAuthProvider,
   createUserWithEmailAndPassword,
   sendEmailVerification,
   signInWithPopup
@@ -34,7 +33,6 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingGoogle, setLoadingGoogle] = useState(false);
-  const [loadingFacebook, setLoadingFacebook] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -131,39 +129,6 @@ export default function SignupPage() {
       setError("Could not sign in with Google. Try again.");
     } finally {
       setLoadingGoogle(false);
-    }
-  };
-
-  const handleFacebook = async () => {
-    setError(null);
-    setMessage(null);
-    setLoadingFacebook(true);
-    try {
-      const provider = new FacebookAuthProvider();
-      const credential = await signInWithPopup(auth, provider);
-      if (credential.user) {
-        await ensureUserProfile(credential.user);
-        router.push("/inbox");
-      }
-    } catch (err) {
-      console.error("Facebook sign-in error (signup):", err);
-      if (err instanceof FirebaseError) {
-        if (err.code === "auth/account-exists-with-different-credential") {
-          setError(
-            "An account with the same email already exists with another sign-in method. Try logging in with your existing method."
-          );
-        } else if (err.code === "auth/popup-closed-by-user") {
-          setError("Facebook sign-in was cancelled before completion.");
-        } else if (err.code === "auth/popup-blocked") {
-          setError("Your browser blocked the Facebook sign-in popup. Allow popups and try again.");
-        } else {
-          setError(`Could not sign in with Facebook (${err.code}).`);
-        }
-      } else {
-        setError("Could not sign in with Facebook. Try again.");
-      }
-    } finally {
-      setLoadingFacebook(false);
     }
   };
 
@@ -267,35 +232,6 @@ export default function SignupPage() {
                     />
                   </svg>
                   <span>Continue with Google</span>
-                </>
-              )}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              fullWidth
-              disabled={loadingFacebook}
-              onClick={handleFacebook}
-            >
-              {loadingFacebook ? (
-                "Connecting to Facebook..."
-              ) : (
-                <>
-                  <svg
-                    className="mr-2 h-4 w-4"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fill="#1877F2"
-                      d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.99 3.66 9.13 8.44 9.88v-6.99H8.08V12h2.36V9.8c0-2.33 1.39-3.62 3.52-3.62.72 0 1.47.13 1.47.13v2.54h-.83c-1.16 0-1.52.72-1.52 1.46V12h2.59l-.41 2.89h-2.18v6.99C18.34 21.13 22 16.99 22 12z"
-                    />
-                    <path
-                      fill="#fff"
-                      d="M16.41 14.89L16.82 12h-2.59v-1.69c0-.74.36-1.46 1.52-1.46h.83V6.31s-.75-.13-1.47-.13c-2.13 0-3.52 1.29-3.52 3.62V12H8.08v2.89h2.36v6.99A10.03 10.03 0 0012 22c.83 0 1.64-.1 2.41-.29v-6.82h2z"
-                    />
-                  </svg>
-                  <span>Continue with Facebook</span>
                 </>
               )}
             </Button>
