@@ -350,6 +350,31 @@ export default function InboxPage() {
                     {question.answerText}
                   </p>
                 )}
+                {question.isAnswered && question.reactionCounts && (
+                  <div className="flex items-center gap-2 text-xs text-slate-400">
+                    <span>Reactions:</span>
+                    <div className="flex gap-1 flex-wrap">
+                      {question.reactionCounts.heart > 0 && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-900/60 px-2 py-0.5">
+                          <span>❤️</span>
+                          <span>{question.reactionCounts.heart}</span>
+                        </span>
+                      )}
+                      {question.reactionCounts.laugh > 0 && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-900/60 px-2 py-0.5">
+                          <span>😂</span>
+                          <span>{question.reactionCounts.laugh}</span>
+                        </span>
+                      )}
+                      {question.reactionCounts.wow > 0 && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-900/60 px-2 py-0.5">
+                          <span>😮</span>
+                          <span>{question.reactionCounts.wow}</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
                 {!question.isAnswered && (
                   <div className="space-y-2">
                     <Textarea

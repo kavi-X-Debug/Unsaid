@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
 
 type Testimonial = {
@@ -54,9 +55,35 @@ const testimonials: Testimonial[] = [
 export default function LandingPage() {
   const { user, loading } = useAuth();
   const showAuthButtons = !loading && !user;
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const sliderRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!testimonials.length) {
+      return;
+    }
+    const interval = setInterval(() => {
+      setActiveTestimonial(previous => {
+        const next = (previous + 1) % testimonials.length;
+        const container = sliderRef.current;
+        if (container) {
+          const child = container.children[next] as HTMLElement | undefined;
+          if (child) {
+            container.scrollTo({
+              left: child.offsetLeft,
+              behavior: "smooth"
+            });
+          }
+        }
+        return next;
+      });
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <main className="min-h-screen flex flex-col bg-gradient-to-b from-slate-950 via-slate-950 to-black">
+    <main className="min-h-screen flex flex-col bg-gradient-to-b from-slate-50 via-slate-50 to-slate-100 dark:from-slate-950 dark:via-slate-950 dark:to-black">
       <section className="flex-1 w-full">
         <div className="mx-auto max-w-6xl px-4 py-12 md:py-16 lg:py-20 flex flex-col gap-10 md:grid md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:items-center">
           <div className="space-y-5 max-w-xl">
@@ -225,8 +252,11 @@ export default function LandingPage() {
               A few made-up comments to show how feedback on Unsaid can look.
             </p>
           </div>
-          <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory">
-            {testimonials.map(testimonial => (
+          <div
+            ref={sliderRef}
+            className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory"
+          >
+            {testimonials.map((testimonial, index) => (
               <div
                 key={testimonial.handle}
                 className="snap-center shrink-0 w-[260px] sm:w-[320px] rounded-2xl border border-slate-800 bg-slate-900/80 p-4 space-y-3"
