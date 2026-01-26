@@ -153,7 +153,21 @@ export default function SignupPage() {
       }
     } catch (err) {
       console.error("Facebook sign-in error (signup):", err);
-      setError("Could not sign in with Facebook. Try again.");
+      if (err instanceof FirebaseError) {
+        if (err.code === "auth/account-exists-with-different-credential") {
+          setError(
+            "An account with the same email already exists with another sign-in method. Try logging in with your existing method."
+          );
+        } else if (err.code === "auth/popup-closed-by-user") {
+          setError("Facebook sign-in was cancelled before completion.");
+        } else if (err.code === "auth/popup-blocked") {
+          setError("Your browser blocked the Facebook sign-in popup. Allow popups and try again.");
+        } else {
+          setError(`Could not sign in with Facebook (${err.code}).`);
+        }
+      } else {
+        setError("Could not sign in with Facebook. Try again.");
+      }
     } finally {
       setLoadingFacebook(false);
     }
