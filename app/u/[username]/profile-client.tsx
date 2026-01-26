@@ -293,10 +293,10 @@ export function ProfilePageClient(props: Props) {
                 avatarLetter
               )}
             </div>
-            <div className="space-y-1">
-              <h1 className="text-2xl font-semibold">{profileTitle}</h1>
-              {displayBio && (
-                <motion.p
+              <div className="space-y-1">
+                <h1 className="text-2xl font-semibold">{profileTitle}</h1>
+                {displayBio && (
+                  <motion.p
                   className="text-sm text-slate-700 dark:text-slate-300"
                   initial={{ opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -304,18 +304,18 @@ export function ProfilePageClient(props: Props) {
                     duration,
                     ease: "easeOut",
                     delay: prefersReducedMotion ? 0 : 0.05
-                  }}
-                >
-                  {displayBio}
-                </motion.p>
-              )}
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center rounded-full bg-slate-900/70 px-3 py-1 text-[11px] text-slate-200 border border-slate-700">
+                    }}
+                  >
+                    {displayBio}
+                  </motion.p>
+                )}
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center rounded-full px-3 py-1 text-[11px] border bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-900/70 dark:text-slate-200 dark:border-slate-700">
                   Anonymous mode
-                </span>
-                <span className="text-[11px] text-slate-500">
+                  </span>
+                  <span className="text-[11px] text-slate-500">
                   Privacy-first Q&A profile
-                </span>
+                  </span>
               </div>
             </div>
           </div>
