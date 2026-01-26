@@ -268,7 +268,7 @@ export function ProfilePageClient(props: Props) {
           transition={{ duration, ease: "easeOut" }}
         >
           <div className="flex items-center gap-4">
-            <div className="relative h-16 w-16 rounded-full bg-sky-500/10 border border-sky-500 flex items-center justify-center text-lg font-semibold text-sky-600 dark:text-sky-300 overflow-hidden">
+            <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-full bg-sky-500/10 border border-sky-500 flex items-center justify-center text-lg font-semibold text-sky-600 dark:text-sky-300 overflow-hidden shadow-md shadow-sky-500/20">
               {props.user.avatarUrl ? (
                 <Image
                   src={props.user.avatarUrl}
