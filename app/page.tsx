@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useAuth } from "@/components/auth/auth-provider";
 
@@ -59,6 +59,16 @@ export default function LandingPage() {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const prefersReducedMotion = useReducedMotion();
   const sectionDuration = prefersReducedMotion ? 0 : 0.4;
+
+  useEffect(() => {
+    if (prefersReducedMotion || testimonials.length <= 1) {
+      return;
+    }
+    const interval = setInterval(() => {
+      setActiveTestimonial(previous => (previous + 1) % testimonials.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [prefersReducedMotion]);
 
   return (
     <main className="min-h-screen flex flex-col bg-gradient-to-b from-slate-50 via-slate-50 to-slate-100 dark:from-slate-950 dark:via-slate-950 dark:to-black">
@@ -258,7 +268,7 @@ export default function LandingPage() {
         </div>
       </motion.section>
       <motion.section
-        className="border-t border-slate-900/70 bg-black/90"
+        className="border-t border-slate-200 bg-slate-50 dark:border-slate-900/70 dark:bg-black/90"
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-80px" }}
@@ -266,17 +276,17 @@ export default function LandingPage() {
       >
         <div className="mx-auto max-w-5xl px-4 py-12 space-y-8">
           <div className="text-center space-y-2">
-            <h2 className="text-xl font-semibold text-slate-100">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
               What people are saying about Unsaid
             </h2>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               A few made-up comments to show how feedback on Unsaid can look.
             </p>
           </div>
           {testimonials.length > 0 && (
             <div className="flex justify-center">
               <div className="w-full max-w-xl space-y-4">
-                <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 space-y-3">
+                <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-3 dark:border-slate-800 dark:bg-slate-900/80">
                   <div className="flex items-center gap-3">
                     <Image
                       src={testimonials[activeTestimonial].image}
@@ -286,10 +296,10 @@ export default function LandingPage() {
                       className="h-12 w-12 rounded-full object-cover border border-slate-700"
                     />
                     <div className="space-y-0.5">
-                      <p className="text-sm font-semibold text-slate-100">
+                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                         {testimonials[activeTestimonial].name}
                       </p>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
                         {testimonials[activeTestimonial].handle}
                       </p>
                       <p className="text-[11px] text-slate-500">
@@ -297,7 +307,7 @@ export default function LandingPage() {
                       </p>
                     </div>
                   </div>
-                  <p className="text-sm text-slate-200 leading-relaxed">
+                  <p className="text-sm text-slate-800 leading-relaxed dark:text-slate-200">
                     “{testimonials[activeTestimonial].quote}”
                   </p>
                 </div>
@@ -307,9 +317,9 @@ export default function LandingPage() {
                     const baseClasses =
                       "flex items-center gap-2 rounded-full border px-3 py-1 text-xs whitespace-nowrap transition";
                     const activeClasses =
-                      "border-sky-400 bg-sky-500/10 text-slate-50";
+                      "border-sky-400 bg-sky-500/10 text-slate-900 dark:text-slate-50";
                     const inactiveClasses =
-                      "border-slate-700 bg-slate-900/60 text-slate-400 hover:border-slate-500";
+                      "border-slate-300 bg-slate-100 text-slate-600 hover:border-slate-400 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-400 dark:hover:border-slate-500";
                     const classes = [
                       baseClasses,
                       isActive ? activeClasses : inactiveClasses
