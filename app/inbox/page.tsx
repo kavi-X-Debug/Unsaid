@@ -711,14 +711,7 @@ export default function InboxPage() {
                   variant="outline"
                   onClick={async () => {
                     try {
-                      const token =
-                        typeof crypto !== "undefined" && "randomUUID" in crypto
-                          ? crypto.randomUUID()
-                          : `${Date.now().toString(36)}-${Math.random()
-                              .toString(36)
-                              .slice(2, 10)}`;
-                      const url = `${shareUrl}?chat=${encodeURIComponent(token)}`;
-                      await navigator.clipboard.writeText(url);
+                      await navigator.clipboard.writeText(shareUrl);
                       setCopyMessage("Link copied ");
                       setTimeout(() => {
                         setCopyMessage(null);

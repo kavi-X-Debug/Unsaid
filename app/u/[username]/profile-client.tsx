@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import type { AppUser, Poll, Question } from "../../../lib/types";
@@ -48,9 +47,7 @@ export function ProfilePageClient(props: Props) {
   const [pollVotes, setPollVotes] = useState<Record<string, number | null>>({});
   const [polls, setPolls] = useState<Poll[]>(props.polls);
   const [chatQuestions, setChatQuestions] = useState<Question[]>([]);
-
-  const searchParams = useSearchParams();
-  const chatToken = searchParams?.get("chat") ?? "";
+  const [anonymousSessionId, setAnonymousSessionId] = useState<string | null>(null);
 
   const prefersReducedMotion = useReducedMotion();
   const duration = prefersReducedMotion ? 0 : 0.18;
@@ -79,6 +76,30 @@ export function ProfilePageClient(props: Props) {
     }
     return username.charAt(0).toUpperCase();
   }, [props.user.username, props.username]);
+
+  useEffect(() => {
+    try {
+      const key = `unsaid_anon_session_${props.user.uid}`;
+      let existing = "";
+      if (typeof window !== "undefined" && window.localStorage) {
+        existing = window.localStorage.getItem(key) ?? "";
+      }
+      if (existing) {
+        setAnonymousSessionId(existing);
+        return;
+      }
+      const generated =
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+      if (typeof window !== "undefined" && window.localStorage) {
+        window.localStorage.setItem(key, generated);
+      }
+      setAnonymousSessionId(generated);
+    } catch {
+      setAnonymousSessionId(null);
+    }
+  }, [props.user.uid]);
 
   const handleShareProfile = async () => {
     setCopied(false);
@@ -117,11 +138,11 @@ export function ProfilePageClient(props: Props) {
   }, [props.polls]);
 
   useEffect(() => {
-    if (!chatToken) {
+    if (!anonymousSessionId) {
       setPolls([]);
       return;
     }
-    const chatId = `${props.user.uid}_${chatToken}`;
+    const chatId = `${props.user.uid}_${anonymousSessionId}`;
     const pollsQuery = query(
       collection(db, "polls"),
       where("chatId", "==", chatId)
@@ -145,14 +166,14 @@ export function ProfilePageClient(props: Props) {
     return () => {
       unsubscribePolls();
     };
-  }, [props.user.uid, chatToken]);
+  }, [props.user.uid, anonymousSessionId]);
 
   useEffect(() => {
-    if (!chatToken) {
+    if (!anonymousSessionId) {
       setChatQuestions([]);
       return;
     }
-    const chatId = `${props.user.uid}_${chatToken}`;
+    const chatId = `${props.user.uid}_${anonymousSessionId}`;
     const questionsQuery = query(
       collection(db, "questions"),
       where("chatId", "==", chatId)
@@ -173,12 +194,12 @@ export function ProfilePageClient(props: Props) {
     return () => {
       unsubscribeQuestions();
     };
-  }, [chatToken, props.user.uid]);
+  }, [anonymousSessionId, props.user.uid]);
 
   const handleAsk = async () => {
     setError(null);
-    if (!chatToken) {
-      setError("Use a valid shared link to send messages.");
+    if (!anonymousSessionId) {
+      setError("Could not start an anonymous session. Try again.");
       return;
     }
     if (!questionText.trim()) {
@@ -195,7 +216,7 @@ export function ProfilePageClient(props: Props) {
         body: JSON.stringify({
           toUserId: props.user.uid,
           questionText: questionText.trim(),
-          chatToken
+          anonymousSessionId
         })
       });
       if (!response.ok) {
@@ -210,8 +231,8 @@ export function ProfilePageClient(props: Props) {
 
   const handleCreatePoll = async () => {
     setError(null);
-    if (!chatToken) {
-      setError("Use a valid shared link to send polls.");
+    if (!anonymousSessionId) {
+      setError("Could not start an anonymous session. Try again.");
       return;
     }
     if (!pollQuestion.trim()) {
@@ -235,7 +256,7 @@ export function ProfilePageClient(props: Props) {
           pollType,
           questionText: pollQuestion.trim(),
           options: trimmedOptions,
-          chatToken
+          anonymousSessionId
         })
       });
       if (!response.ok) {
@@ -343,29 +364,6 @@ export function ProfilePageClient(props: Props) {
           </div>
         </motion.header>
 
-        <Card className="p-4 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow">
-          <div className="grid grid-cols-3 gap-4 text-xs sm:text-sm">
-            <div className="space-y-1">
-              <p className="text-slate-500 dark:text-slate-400">Questions received</p>
-              <p className="text-lg font-semibold">
-                {props.stats.totalQuestions.toLocaleString()}
-              </p>
-            </div>
-            <div className="space-y-1">
-              <p className="text-slate-500 dark:text-slate-400">Questions answered</p>
-              <p className="text-lg font-semibold">
-                {props.stats.totalAnswered.toLocaleString()}
-              </p>
-            </div>
-            <div className="space-y-1">
-              <p className="text-slate-500 dark:text-slate-400">Polls published</p>
-              <p className="text-lg font-semibold">
-                {props.stats.totalPolls.toLocaleString()}
-              </p>
-            </div>
-          </div>
-        </Card>
-
         <section className="space-y-4">
           <Card className="p-4 space-y-3 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow">
             <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
@@ -382,7 +380,7 @@ export function ProfilePageClient(props: Props) {
             </Button>
           </Card>
 
-          {chatToken && (
+          {anonymousSessionId && (
             <Card className="p-4 space-y-3 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow">
               <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                 Your conversation

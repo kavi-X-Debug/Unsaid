@@ -11,11 +11,12 @@ export async function POST(request: NextRequest, context: { params: { username: 
   try {
     const body = await request.json();
     const toUserId = typeof body.toUserId === "string" ? body.toUserId : "";
-    const rawToken = typeof body.chatToken === "string" ? body.chatToken.trim() : "";
+    const anonymousSessionId =
+      typeof body.anonymousSessionId === "string" ? body.anonymousSessionId.trim() : "";
     const pollType = body.pollType === "multiple_choice" ? "multiple_choice" : "yes_no";
     const questionText = typeof body.questionText === "string" ? body.questionText.trim() : "";
     const options = Array.isArray(body.options) ? body.options : [];
-    if (!toUserId || !questionText || !rawToken) {
+    if (!toUserId || !questionText || !anonymousSessionId) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
     if (containsProfanity(questionText)) {
@@ -50,9 +51,10 @@ export async function POST(request: NextRequest, context: { params: { username: 
     if (normalizedOptions.length < 2) {
       return NextResponse.json({ error: "Not enough options" }, { status: 400 });
     }
-    const chatId = `${toUserId}_${rawToken}`;
+    const chatId = `${toUserId}_${anonymousSessionId}`;
     await addDoc(collection(db, "polls"), {
       toUserId,
+      anonymousId: anonymousSessionId,
       chatId,
       pollType,
       questionText,

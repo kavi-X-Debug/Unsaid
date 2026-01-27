@@ -12,8 +12,9 @@ export async function POST(request: NextRequest, context: { params: { username: 
     const body = await request.json();
     const questionText = typeof body.questionText === "string" ? body.questionText.trim() : "";
     const toUserId = typeof body.toUserId === "string" ? body.toUserId : "";
-    const rawToken = typeof body.chatToken === "string" ? body.chatToken.trim() : "";
-    if (!questionText || !toUserId || !rawToken) {
+    const anonymousSessionId =
+      typeof body.anonymousSessionId === "string" ? body.anonymousSessionId.trim() : "";
+    if (!questionText || !toUserId || !anonymousSessionId) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
     if (containsProfanity(questionText)) {
@@ -35,9 +36,10 @@ export async function POST(request: NextRequest, context: { params: { username: 
         { status: 429 }
       );
     }
-    const chatId = `${toUserId}_${rawToken}`;
+    const chatId = `${toUserId}_${anonymousSessionId}`;
     await addDoc(collection(db, "questions"), {
       toUserId,
+      anonymousId: anonymousSessionId,
       chatId,
       questionText,
       answerText: null,

@@ -279,13 +279,8 @@ export default function ProfilePage() {
     if (!profileBaseUrl) {
       return;
     }
-    const token =
-      typeof crypto !== "undefined" && "randomUUID" in crypto
-        ? crypto.randomUUID()
-        : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
-    const chatUrl = `${profileBaseUrl}?chat=${encodeURIComponent(token)}`;
-    setShareUrl(chatUrl);
-    const message = `Check out my Unsaid profile: ${chatUrl}`;
+    setShareUrl(profileBaseUrl);
+    const message = `Check out my Unsaid profile: ${profileBaseUrl}`;
     const waUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     if (typeof window !== "undefined") {
       window.open(waUrl, "_blank", "noopener,noreferrer");
