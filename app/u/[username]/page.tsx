@@ -71,24 +71,7 @@ export default async function UserProfilePage(props: Props) {
     return bDate - aDate;
   });
 
-  const pollsSnapshot = await getDocs(
-    query(collection(db, "polls"), where("toUserId", "==", userId))
-  );
-
   const publishedPolls: Poll[] = [];
-
-  pollsSnapshot.forEach(docSnap => {
-    const data = docSnap.data() as Omit<Poll, "id">;
-    if (data.isPublished && !data.isReported) {
-      publishedPolls.push({ id: docSnap.id, ...data });
-    }
-  });
-
-  publishedPolls.sort((a, b) => {
-    const aDate = a.createdAt?.toMillis?.() ?? 0;
-    const bDate = b.createdAt?.toMillis?.() ?? 0;
-    return bDate - aDate;
-  });
 
   const currentViews = (userData as any).profileViews ?? 0;
   const stats = {

@@ -45,6 +45,7 @@ export type Poll = {
   id: string;
   toUserId: string;
   anonymousId?: string | null;
+  chatId?: string;
   pollType: PollType;
   questionText?: string;
   options: PollOption[];

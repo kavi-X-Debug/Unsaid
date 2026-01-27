@@ -117,9 +117,14 @@ export function ProfilePageClient(props: Props) {
   }, [props.polls]);
 
   useEffect(() => {
+    if (!chatToken) {
+      setPolls([]);
+      return;
+    }
+    const chatId = `${props.user.uid}_${chatToken}`;
     const pollsQuery = query(
       collection(db, "polls"),
-      where("toUserId", "==", props.user.uid)
+      where("chatId", "==", chatId)
     );
     const unsubscribePolls = onSnapshot(pollsQuery, snapshot => {
       const published: Poll[] = [];
@@ -140,7 +145,7 @@ export function ProfilePageClient(props: Props) {
     return () => {
       unsubscribePolls();
     };
-  }, [props.user.uid]);
+  }, [props.user.uid, chatToken]);
 
   useEffect(() => {
     if (!chatToken) {
