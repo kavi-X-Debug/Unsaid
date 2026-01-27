@@ -24,6 +24,7 @@ export type Question = {
   id: string;
   toUserId: string;
   anonymousId?: string | null;
+  chatId?: string;
   questionText: string;
   answerText?: string;
   isAnswered: boolean;
@@ -51,4 +52,19 @@ export type Poll = {
   isReported?: boolean;
   createdAt: Timestamp | null;
   ownerSelection?: number | null;
+};
+
+export type Chat = {
+  id: string;
+  receiverUserId: string;
+  token: string;
+  createdAt: Timestamp | null;
+};
+
+export type Message = {
+  id: string;
+  chatId: string;
+  messageText: string;
+  createdAt: Timestamp | null;
+  sender: "anonymous";
 };

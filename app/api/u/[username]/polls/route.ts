@@ -11,10 +11,6 @@ export async function POST(request: NextRequest, context: { params: { username: 
   try {
     const body = await request.json();
     const toUserId = typeof body.toUserId === "string" ? body.toUserId : "";
-    const anonymousId =
-      typeof body.anonymousId === "string" && body.anonymousId.length > 0
-        ? body.anonymousId
-        : null;
     const pollType = body.pollType === "multiple_choice" ? "multiple_choice" : "yes_no";
     const questionText = typeof body.questionText === "string" ? body.questionText.trim() : "";
     const options = Array.isArray(body.options) ? body.options : [];
@@ -55,7 +51,6 @@ export async function POST(request: NextRequest, context: { params: { username: 
     }
     await addDoc(collection(db, "polls"), {
       toUserId,
-      anonymousId,
       pollType,
       questionText,
       options: normalizedOptions,

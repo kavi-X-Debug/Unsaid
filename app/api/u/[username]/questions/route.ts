@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc
+} from "firebase/firestore";
 import { db } from "../../../../../lib/firebase";
 import {
   checkAnonymousRateLimit,
@@ -12,11 +19,8 @@ export async function POST(request: NextRequest, context: { params: { username: 
     const body = await request.json();
     const questionText = typeof body.questionText === "string" ? body.questionText.trim() : "";
     const toUserId = typeof body.toUserId === "string" ? body.toUserId : "";
-    const anonymousId =
-      typeof body.anonymousId === "string" && body.anonymousId.length > 0
-        ? body.anonymousId
-        : null;
-    if (!questionText || !toUserId) {
+    const rawToken = typeof body.chatToken === "string" ? body.chatToken.trim() : "";
+    if (!questionText || !toUserId || !rawToken) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
     if (containsProfanity(questionText)) {
@@ -38,9 +42,25 @@ export async function POST(request: NextRequest, context: { params: { username: 
         { status: 429 }
       );
     }
+    const chatId = `${toUserId}_${rawToken}`;
+    const chatRef = doc(collection(db, "chats"), chatId);
+    const existingChat = await getDoc(chatRef);
+    if (!existingChat.exists()) {
+      await setDoc(chatRef, {
+        receiverUserId: toUserId,
+        token: rawToken,
+        createdAt: serverTimestamp()
+      });
+    }
+    await addDoc(collection(db, "messages"), {
+      chatId,
+      messageText: questionText,
+      createdAt: serverTimestamp(),
+      sender: "anonymous"
+    });
     await addDoc(collection(db, "questions"), {
       toUserId,
-      anonymousId,
+      chatId,
       questionText,
       answerText: null,
       isAnswered: false,

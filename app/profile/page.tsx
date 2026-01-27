@@ -46,6 +46,7 @@ export default function ProfilePage() {
   const [viewCount, setViewCount] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [profileBaseUrl, setProfileBaseUrl] = useState<string | null>(null);
   const [initializing, setInitializing] = useState(true);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -136,7 +137,9 @@ export default function ProfilePage() {
           ? window.location.origin
           : "";
       if (origin && nextUsername) {
-        setShareUrl(`${origin}/profile/${nextUsername.toLowerCase()}`);
+        const base = `${origin}/profile/${nextUsername.toLowerCase()}`;
+        setProfileBaseUrl(base);
+        setShareUrl(null);
       }
       setInitializing(false);
     };
@@ -261,7 +264,9 @@ export default function ProfilePage() {
           ? window.location.origin
           : "";
       if (origin) {
-        setShareUrl(`${origin}/profile/${cleaned}`);
+        const base = `${origin}/profile/${cleaned}`;
+        setProfileBaseUrl(base);
+        setShareUrl(null);
       }
       setIsEditingUsername(false);
       setUsernameMessage("Username changed successfully");
@@ -271,10 +276,16 @@ export default function ProfilePage() {
   };
 
   const handleShareWhatsApp = () => {
-    if (!shareUrl) {
+    if (!profileBaseUrl) {
       return;
     }
-    const message = `Check out my Unsaid profile: ${shareUrl}`;
+    const token =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    const url = `${profileBaseUrl}?chat=${encodeURIComponent(token)}`;
+    setShareUrl(url);
+    const message = `Check out my Unsaid profile: ${url}`;
     const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
     if (typeof window !== "undefined") {
       window.open(url, "_blank", "noopener,noreferrer");
@@ -500,12 +511,15 @@ export default function ProfilePage() {
           )}
           {shareUrl && (
             <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleShareWhatsApp}
-                className="text-xs px-3 py-1 h-auto gap-1"
-              >
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                handleShareWhatsApp();
+                setQrModalOpen(true);
+              }}
+              className="text-xs px-3 py-1 h-auto gap-1"
+            >
                 <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-[#25D366] text-white">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

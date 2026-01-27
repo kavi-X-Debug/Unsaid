@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import type { AppUser, Poll, Question } from "../../../lib/types";
@@ -48,7 +49,9 @@ export function ProfilePageClient(props: Props) {
   const [pollVotes, setPollVotes] = useState<Record<string, number | null>>({});
   const [questions, setQuestions] = useState<Question[]>(props.questions);
   const [polls, setPolls] = useState<Poll[]>(props.polls);
-  const [anonymousId, setAnonymousId] = useState<string | null>(null);
+
+  const searchParams = useSearchParams();
+  const chatToken = searchParams?.get("chat") ?? "";
 
   const prefersReducedMotion = useReducedMotion();
   const duration = prefersReducedMotion ? 0 : 0.18;
@@ -69,27 +72,6 @@ export function ProfilePageClient(props: Props) {
     }
     return `${trimmed.slice(0, 157)}...`;
   }, [props.user.bio]);
-
-  useEffect(() => {
-    try {
-      const storageKey = "unsaid_anonymous_id";
-      const existing =
-        typeof window !== "undefined" ? window.localStorage.getItem(storageKey) : null;
-      if (existing) {
-        setAnonymousId(existing);
-        return;
-      }
-      const generated =
-        typeof crypto !== "undefined" && "randomUUID" in crypto
-          ? crypto.randomUUID()
-          : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem(storageKey, generated);
-      }
-      setAnonymousId(generated);
-    } catch {
-    }
-  }, []);
 
   const avatarLetter = useMemo(() => {
     const username = props.user.username || props.username;
@@ -184,6 +166,10 @@ export function ProfilePageClient(props: Props) {
 
   const handleAsk = async () => {
     setError(null);
+    if (!chatToken) {
+      setError("Use a valid shared link to send messages.");
+      return;
+    }
     if (!questionText.trim()) {
       setError("Write a question first.");
       return;
@@ -198,7 +184,7 @@ export function ProfilePageClient(props: Props) {
         body: JSON.stringify({
           toUserId: props.user.uid,
           questionText: questionText.trim(),
-          anonymousId
+          chatToken
         })
       });
       if (!response.ok) {
@@ -213,6 +199,10 @@ export function ProfilePageClient(props: Props) {
 
   const handleCreatePoll = async () => {
     setError(null);
+    if (!chatToken) {
+      setError("Use a valid shared link to send polls.");
+      return;
+    }
     if (!pollQuestion.trim()) {
       setError("Write a poll question first.");
       return;
@@ -234,7 +224,7 @@ export function ProfilePageClient(props: Props) {
           pollType,
           questionText: pollQuestion.trim(),
           options: trimmedOptions,
-          anonymousId
+          chatToken
         })
       });
       if (!response.ok) {

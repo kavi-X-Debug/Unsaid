@@ -263,29 +263,25 @@ export default function InboxPage() {
     const threadMapNew = new Map<string, InboxThread>();
     const threadMapAnswered = new Map<string, InboxThread>();
 
-    const ensureThread = (
-      map: Map<string, InboxThread>,
-      item: InboxItem
-    ) => {
-      let anonymousId: string | null = null;
-      let toUserId: string;
+    const ensureThread = (map: Map<string, InboxThread>, item: InboxItem) => {
       if (item.type === "question") {
         const question = item.data as Question;
-        anonymousId = question.anonymousId ?? null;
-        toUserId = question.toUserId;
+        const base = (question as any).chatId || `question-${question.id}`;
+        if (!map.has(base)) {
+          const suffixSource = base;
+          const suffix = suffixSource.slice(-4).toUpperCase();
+          const label = `Chat #${suffix}`;
+          map.set(base, { key: base, label, items: [] });
+        }
+        map.get(base)!.items.push(item);
       } else {
         const poll = item.data as Poll;
-        anonymousId = poll.anonymousId ?? null;
-        toUserId = poll.toUserId;
+        const base = `poll-${poll.id}`;
+        if (!map.has(base)) {
+          map.set(base, { key: base, label: "Poll", items: [] });
+        }
+        map.get(base)!.items.push(item);
       }
-      const base = anonymousId ?? `legacy-${toUserId}`;
-      if (!map.has(base)) {
-        const suffixSource = anonymousId ?? base;
-        const suffix = suffixSource.slice(-4).toUpperCase();
-        const label = anonymousId ? `Anonymous #${suffix}` : "Legacy anonymous chat";
-        map.set(base, { key: base, label, items: [] });
-      }
-      map.get(base)!.items.push(item);
     };
 
     newItems.forEach(item => ensureThread(threadMapNew, item));
@@ -709,7 +705,14 @@ export default function InboxPage() {
                   variant="outline"
                   onClick={async () => {
                     try {
-                      await navigator.clipboard.writeText(shareUrl);
+                      const token =
+                        typeof crypto !== "undefined" && "randomUUID" in crypto
+                          ? crypto.randomUUID()
+                          : `${Date.now().toString(36)}-${Math.random()
+                              .toString(36)
+                              .slice(2, 10)}`;
+                      const url = `${shareUrl}?chat=${encodeURIComponent(token)}`;
+                      await navigator.clipboard.writeText(url);
                       setCopyMessage("Link copied ");
                       setTimeout(() => {
                         setCopyMessage(null);
