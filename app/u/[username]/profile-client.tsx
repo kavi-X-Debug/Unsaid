@@ -30,6 +30,14 @@ type Props = {
   polls: Poll[];
 };
 
+const formatTime = (timestamp: any) => {
+  if (!timestamp?.toDate) {
+    return "";
+  }
+  const date = timestamp.toDate() as Date;
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+};
+
 export function ProfilePageClient(props: Props) {
   const [questionText, setQuestionText] = useState("");
   const [pollType, setPollType] = useState<PollDraftType>("yes_no");
@@ -39,6 +47,7 @@ export function ProfilePageClient(props: Props) {
   const [error, setError] = useState<string | null>(null);
   const [pollVotes, setPollVotes] = useState<Record<string, number | null>>({});
   const [polls, setPolls] = useState<Poll[]>(props.polls);
+  const [chatQuestions, setChatQuestions] = useState<Question[]>([]);
 
   const searchParams = useSearchParams();
   const chatToken = searchParams?.get("chat") ?? "";
@@ -132,6 +141,34 @@ export function ProfilePageClient(props: Props) {
       unsubscribePolls();
     };
   }, [props.user.uid]);
+
+  useEffect(() => {
+    if (!chatToken) {
+      setChatQuestions([]);
+      return;
+    }
+    const chatId = `${props.user.uid}_${chatToken}`;
+    const questionsQuery = query(
+      collection(db, "questions"),
+      where("chatId", "==", chatId)
+    );
+    const unsubscribeQuestions = onSnapshot(questionsQuery, snapshot => {
+      const items: Question[] = [];
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data() as Omit<Question, "id">;
+        items.push({ id: docSnap.id, ...data });
+      });
+      items.sort((a, b) => {
+        const aDate = a.createdAt?.toMillis?.() ?? 0;
+        const bDate = b.createdAt?.toMillis?.() ?? 0;
+        return aDate - bDate;
+      });
+      setChatQuestions(items);
+    });
+    return () => {
+      unsubscribeQuestions();
+    };
+  }, [chatToken, props.user.uid]);
 
   const handleAsk = async () => {
     setError(null);
@@ -339,6 +376,56 @@ export function ProfilePageClient(props: Props) {
               {submitting ? "Sending..." : "Send anonymously"}
             </Button>
           </Card>
+
+          {chatToken && (
+            <Card className="p-4 space-y-3 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow">
+              <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                Your conversation
+              </h2>
+              {chatQuestions.length === 0 && (
+                <p className="text-sm text-slate-600 dark:text-slate-500">
+                  Your messages and replies will appear here.
+                </p>
+              )}
+              {chatQuestions.length > 0 && (
+                <div className="space-y-3">
+                  {chatQuestions.map(question => {
+                    const sentTime = formatTime(question.createdAt);
+                    const repliedTime = formatTime((question as any).answeredAt);
+                    return (
+                      <div
+                        key={question.id}
+                        className="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2 dark:border-slate-800 dark:bg-slate-900/60"
+                      >
+                        <p className="text-sm text-slate-800 dark:text-slate-100 whitespace-pre-wrap">
+                          {question.questionText}
+                        </p>
+                        {question.isAnswered && question.answerText && (
+                          <div className="rounded-lg bg-white border border-slate-200 p-2 text-sm text-slate-800 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100">
+                            {question.answerText}
+                          </div>
+                        )}
+                        {(sentTime || repliedTime) && (
+                          <div className="flex justify-end text-[11px] text-slate-500 dark:text-slate-500">
+                            <span>
+                              {sentTime && `Sent ${sentTime}`}
+                              {sentTime && repliedTime && " • "}
+                              {repliedTime && `Replied ${repliedTime}`}
+                            </span>
+                          </div>
+                        )}
+                        {!question.isAnswered && (
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                            Waiting for a reply
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </Card>
+          )}
 
           <Card className="p-4 space-y-3 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow">
             <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
