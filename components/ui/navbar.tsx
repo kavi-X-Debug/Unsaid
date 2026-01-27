@@ -76,11 +76,6 @@ export function Navbar() {
           <div className="relative h-8 w-8 overflow-hidden rounded-full border border-slate-300 dark:border-slate-700">
             <Image src={logo} alt="UnSaid" fill sizes="32px" className="object-cover" />
           </div>
-          <span
-            className={`${loversFont.className} text-3xl sm:text-[2.3rem] font-normal text-slate-800 dark:text-slate-100 leading-none`}
-          >
-            UnSaid
-          </span>
         </Link>
         <div className="flex items-center gap-1 rounded-full bg-slate-100 px-1 py-0.5 text-xs border border-slate-200 dark:bg-slate-900/80 dark:border-slate-800 max-w-full overflow-x-auto">
           {links.map(link => {
@@ -105,9 +100,14 @@ export function Navbar() {
                   )}
                 </span>
               </Link>
-            );
-          })}
+          ))}
         </div>
+        <span
+          className={`${loversFont.className} text-3xl sm:text-[2.3rem] font-normal text-slate-800 dark:text-slate-100 leading-none`}
+        >
+          UnSaid
+        </span>
+      </div>
       </div>
     </nav>
   );
