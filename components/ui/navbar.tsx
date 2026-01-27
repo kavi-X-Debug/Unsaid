@@ -100,14 +100,14 @@ export function Navbar() {
                   )}
                 </span>
               </Link>
-          ))}
+            );
+          })}
         </div>
         <span
           className={`${loversFont.className} text-3xl sm:text-[2.3rem] font-normal text-slate-800 dark:text-slate-100 leading-none`}
         >
           UnSaid
         </span>
-      </div>
       </div>
     </nav>
   );
