@@ -10,7 +10,6 @@ import { Card } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Textarea } from "../../../components/ui/textarea";
 import { Input } from "../../../components/ui/input";
-import { ReactionBar } from "../../../components/questions/reaction-bar";
 import { StaggerContainer } from "../../../components/ui/motion";
 import { db } from "../../../lib/firebase";
 
@@ -31,14 +30,6 @@ type Props = {
   polls: Poll[];
 };
 
-const formatTime = (timestamp: any) => {
-  if (!timestamp?.toDate) {
-    return "";
-  }
-  const date = timestamp.toDate() as Date;
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-};
-
 export function ProfilePageClient(props: Props) {
   const [questionText, setQuestionText] = useState("");
   const [pollType, setPollType] = useState<PollDraftType>("yes_no");
@@ -47,7 +38,6 @@ export function ProfilePageClient(props: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pollVotes, setPollVotes] = useState<Record<string, number | null>>({});
-  const [questions, setQuestions] = useState<Question[]>(props.questions);
   const [polls, setPolls] = useState<Poll[]>(props.polls);
 
   const searchParams = useSearchParams();
@@ -118,26 +108,6 @@ export function ProfilePageClient(props: Props) {
   }, [props.polls]);
 
   useEffect(() => {
-    const questionsQuery = query(
-      collection(db, "questions"),
-      where("toUserId", "==", props.user.uid)
-    );
-    const unsubscribeQuestions = onSnapshot(questionsQuery, snapshot => {
-      const answered: Question[] = [];
-      snapshot.forEach(docSnap => {
-        const data = docSnap.data() as Omit<Question, "id">;
-        if (data.isAnswered && !data.isReported) {
-          answered.push({ id: docSnap.id, ...data });
-        }
-      });
-      answered.sort((a, b) => {
-        const aDate = a.createdAt?.toMillis?.() ?? 0;
-        const bDate = b.createdAt?.toMillis?.() ?? 0;
-        return bDate - aDate;
-      });
-      setQuestions(answered);
-    });
-
     const pollsQuery = query(
       collection(db, "polls"),
       where("toUserId", "==", props.user.uid)
@@ -159,7 +129,6 @@ export function ProfilePageClient(props: Props) {
     });
 
     return () => {
-      unsubscribeQuestions();
       unsubscribePolls();
     };
   }, [props.user.uid]);
@@ -436,59 +405,6 @@ export function ProfilePageClient(props: Props) {
           </Card>
           {error && <p className="text-sm text-rose-400">{error}</p>}
         </section>
-
-        <motion.section
-          className="space-y-3"
-          initial={{ opacity: 0, y: 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration, ease: "easeOut" }}
-        >
-          <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-            Answered questions
-          </h2>
-          {questions.length === 0 && (
-            <p className="text-sm text-slate-600 dark:text-slate-500">
-              No answered questions yet.
-            </p>
-          )}
-          <StaggerContainer>
-            {questions.map(question => (
-              <Card
-                key={question.id}
-                className="p-4 space-y-3 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow"
-              >
-                <div className="space-y-2">
-                  <p className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
-                    {question.questionText}
-                  </p>
-                  {question.answerText && (
-                    <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
-                      {question.answerText}
-                    </p>
-                  )}
-                  {(formatTime(question.createdAt) || formatTime((question as any).answeredAt)) && (
-                    <div className="flex justify-end text-[11px] text-slate-500 dark:text-slate-500">
-                      <span>
-                        {formatTime(question.createdAt) &&
-                          `Sent ${formatTime(question.createdAt)}`}
-                        {formatTime(question.createdAt) &&
-                          formatTime((question as any).answeredAt) &&
-                          " • "}
-                        {formatTime((question as any).answeredAt) &&
-                          `Replied ${formatTime((question as any).answeredAt)}`}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <ReactionBar
-                  questionId={question.id}
-                  initialCounts={question.reactionCounts}
-                />
-              </Card>
-            ))}
-          </StaggerContainer>
-        </motion.section>
 
         <motion.section
           className="space-y-3"
