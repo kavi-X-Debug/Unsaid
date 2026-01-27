@@ -234,6 +234,103 @@ export default function LandingPage() {
         </div>
       </motion.section>
       <motion.section
+        className="border-t border-slate-200 bg-slate-50/90 backdrop-blur-sm dark:border-slate-800/60 dark:bg-slate-950/70"
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: sectionDuration, ease: "easeOut" }}
+      >
+        <div className="mx-auto max-w-5xl px-4 py-10 space-y-6">
+          <div className="text-center space-y-2">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+              Everything you need in one place
+            </h2>
+            <p className="text-sm text-slate-700 dark:text-slate-400">
+              Floating cards that keep the most important tools close and easy to understand.
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <motion.div
+              whileHover={{ y: -4 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="rounded-2xl border border-slate-200 bg-white/90 shadow-sm shadow-slate-200/70 p-4 space-y-2 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-slate-900/60"
+            >
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                Separate chats for each anonymous user
+              </p>
+              <p className="text-xs text-slate-700 dark:text-slate-400">
+                Every visitor gets their own private conversation, so messages never mix and each chat
+                feels personal.
+              </p>
+            </motion.div>
+            <motion.div
+              whileHover={{ y: -4 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="rounded-2xl border border-slate-200 bg-white/90 shadow-sm shadow-slate-200/70 p-4 space-y-2 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-slate-900/60"
+            >
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                One simple profile link
+              </p>
+              <p className="text-xs text-slate-700 dark:text-slate-400">
+                Share a single link everywhere. Behind the scenes, Unsaid keeps sessions separate per
+                browser for extra privacy.
+              </p>
+            </motion.div>
+            <motion.div
+              whileHover={{ y: -4 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="rounded-2xl border border-slate-200 bg-white/90 shadow-sm shadow-slate-200/70 p-4 space-y-2 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-slate-900/60"
+            >
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                Private answers, public when you choose
+              </p>
+              <p className="text-xs text-slate-700 dark:text-slate-400">
+                Read and answer in your inbox first. Only publish what feels right for your audience.
+              </p>
+            </motion.div>
+            <motion.div
+              whileHover={{ y: -4 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="rounded-2xl border border-slate-200 bg-white/90 shadow-sm shadow-slate-200/70 p-4 space-y-2 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-slate-900/60"
+            >
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                Anonymous polls that match your chats
+              </p>
+              <p className="text-xs text-slate-700 dark:text-slate-400">
+                Create quick yes/no or multiple-choice polls that stay linked to each anonymous
+                conversation.
+              </p>
+            </motion.div>
+            <motion.div
+              whileHover={{ y: -4 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="rounded-2xl border border-slate-200 bg-white/90 shadow-sm shadow-slate-200/70 p-4 space-y-2 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-slate-900/60"
+            >
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                Safety tools built in
+              </p>
+              <p className="text-xs text-slate-700 dark:text-slate-400">
+                Use reporting and positive-only settings to keep your space kind, calm, and
+                comfortable to use.
+              </p>
+            </motion.div>
+            <motion.div
+              whileHover={{ y: -4 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="rounded-2xl border border-slate-200 bg-white/90 shadow-sm shadow-slate-200/70 p-4 space-y-2 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-slate-900/60"
+            >
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                User-friendly from phone to desktop
+              </p>
+              <p className="text-xs text-slate-700 dark:text-slate-400">
+                Cards adapt to any screen, so sending questions and answering them always feels light
+                and easy.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </motion.section>
+      <motion.section
         className="border-t border-slate-900/70 bg-black/90"
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}

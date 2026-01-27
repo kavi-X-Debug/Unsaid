@@ -401,41 +401,35 @@ export default function ProfilePage() {
           </p>
         </header>
 
-        <Card className="p-4 space-y-3">
+        <Card className="p-4 space-y-4">
           <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
             Profile overview
           </h2>
-          {avatarUrl && (
-            <div className="flex items-center gap-3 pt-1">
-              <div className="h-10 w-10 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-700">
+          <div className="flex flex-col items-center gap-3 pt-2">
+            <div className="h-20 w-20 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+              {avatarUrl && (
                 <Image
                   src={avatarUrl}
                   alt="Profile image"
-                  width={40}
-                  height={40}
-                  className="h-10 w-10 rounded-full object-cover"
+                  width={80}
+                  height={80}
+                  className="h-20 w-20 rounded-full object-cover"
                 />
-              </div>
-              <p className="text-xs text-slate-600 dark:text-slate-400">Current profile image</p>
+              )}
             </div>
-          )}
-          {!isEditingUsername ? (
-            <>
-              <div className="flex items-center gap-2">
-                <p className="text-xs text-slate-600 dark:text-slate-400">
-                  Username:{" "}
-                  <span className="font-mono text-slate-800 dark:text-slate-200">
+            {!isEditingUsername ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-slate-800 dark:text-slate-200 text-sm">
                     {profileTitle}
                   </span>
-                </p>
-                {isVerified && (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-300">
-                    <span>✓</span>
-                    <span>Verified</span>
-                  </span>
-                )}
-              </div>
-              <div className="flex justify-end pt-1">
+                  {isVerified && (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-300">
+                      <span>✓</span>
+                      <span>Verified</span>
+                    </span>
+                  )}
+                </div>
                 <Button
                   type="button"
                   variant="outline"
@@ -445,64 +439,67 @@ export default function ProfilePage() {
                     setIsEditingUsername(true);
                   }}
                   disabled={usernameSaving || !username}
+                  className="text-xs px-3 py-1 h-auto"
                 >
                   Change username
                 </Button>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="space-y-1 pt-1">
-                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                  New username
-                </label>
-                <Input
-                  type="text"
-                  value={usernameDraft}
-                  onChange={event => setUsernameDraft(event.target.value)}
-                  autoComplete="off"
-                />
-                <p className="text-[11px] text-slate-500 dark:text-slate-500">
-                  Use 3–24 characters: letters, numbers, and underscores only.
-                </p>
-              </div>
-              <div className="flex justify-end gap-2 pt-1">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setUsernameDraft(username ?? "");
-                    setUsernameError(null);
-                    setIsEditingUsername(false);
-                  }}
-                  disabled={usernameSaving}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleSaveUsername}
-                  disabled={usernameSaving}
-                >
-                  {usernameSaving ? "Saving..." : "Save username"}
-                </Button>
-              </div>
-            </>
-          )}
+                {joinedText && (
+                  <p className="text-xs text-slate-600 dark:text-slate-400">
+                    Joined {joinedText}
+                  </p>
+                )}
+                {viewCount != null && (
+                  <p className="text-xs text-slate-600 dark:text-slate-400">
+                    Profile views: {viewCount.toLocaleString()}
+                  </p>
+                )}
+              </>
+            ) : (
+              <>
+                <div className="space-y-1 w-full pt-1">
+                  <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                    New username
+                  </label>
+                  <Input
+                    type="text"
+                    value={usernameDraft}
+                    onChange={event => setUsernameDraft(event.target.value)}
+                    autoComplete="off"
+                  />
+                  <p className="text-[11px] text-slate-500 dark:text-slate-500">
+                    Use 3–24 characters: letters, numbers, and underscores only.
+                  </p>
+                </div>
+                <div className="flex justify-end gap-2 w-full pt-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => {
+                      setUsernameDraft(username ?? "");
+                      setUsernameError(null);
+                      setIsEditingUsername(false);
+                    }}
+                    disabled={usernameSaving}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleSaveUsername}
+                    disabled={usernameSaving}
+                  >
+                    {usernameSaving ? "Saving..." : "Save username"}
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
           {usernameError && (
             <p className="text-xs text-rose-400">{usernameError}</p>
           )}
           {usernameMessage && (
             <p className="text-xs text-emerald-400">{usernameMessage}</p>
-          )}
-          {joinedText && (
-            <p className="text-xs text-slate-600 dark:text-slate-400">Joined {joinedText}</p>
-          )}
-          {viewCount != null && (
-            <p className="text-xs text-slate-600 dark:text-slate-400">
-              Profile views: {viewCount.toLocaleString()}
-            </p>
           )}
           {shareUrl && (
             <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
