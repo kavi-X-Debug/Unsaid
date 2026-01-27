@@ -1,12 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  serverTimestamp,
-  setDoc
-} from "firebase/firestore";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../../../../../lib/firebase";
 import {
   checkAnonymousRateLimit,
@@ -43,21 +36,6 @@ export async function POST(request: NextRequest, context: { params: { username: 
       );
     }
     const chatId = `${toUserId}_${rawToken}`;
-    const chatRef = doc(collection(db, "chats"), chatId);
-    const existingChat = await getDoc(chatRef);
-    if (!existingChat.exists()) {
-      await setDoc(chatRef, {
-        receiverUserId: toUserId,
-        token: rawToken,
-        createdAt: serverTimestamp()
-      });
-    }
-    await addDoc(collection(db, "messages"), {
-      chatId,
-      messageText: questionText,
-      createdAt: serverTimestamp(),
-      sender: "anonymous"
-    });
     await addDoc(collection(db, "questions"), {
       toUserId,
       chatId,
