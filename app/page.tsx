@@ -340,6 +340,12 @@ export default function LandingPage() {
           )}
         </div>
       </motion.section>
+      <footer className="border-t border-slate-200 bg-slate-50 py-4 dark:border-slate-800 dark:bg-slate-950">
+        <div className="mx-auto max-w-5xl px-4 text-center text-[11px] text-slate-700 dark:text-slate-400 space-y-1">
+          <p>Contact: kavishchathur2002@gmail.com</p>
+          <p>Phone: +94 76 391 9823</p>
+        </div>
+      </footer>
     </main>
   );
 }
