@@ -75,10 +75,10 @@ export default function LandingPage() {
             </p>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight">
               <span className="bg-gradient-to-r from-sky-400 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                Let people ask anything.
+                One link for honest, anonymous questions.
               </span>
               <span className="block text-slate-900 dark:text-slate-100">
-                You decide what goes public.
+                Separate chats that stay private to each visitor.
               </span>
             </h1>
             <p className="text-sm md:text-base text-slate-900 dark:text-slate-300">
