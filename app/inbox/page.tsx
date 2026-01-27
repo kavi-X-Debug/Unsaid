@@ -265,28 +265,31 @@ export default function InboxPage() {
 
     const ensureThread = (
       map: Map<string, InboxThread>,
-      item: InboxItem,
-      index: number
+      item: InboxItem
     ) => {
-      const base =
-        item.type === "question"
-          ? (item.data as Question).anonymousId ?? `question-${item.id}`
-          : (item.data as Poll).anonymousId ?? `poll-${item.id}`;
-      let key = base;
-      if (!map.has(key)) {
-        const label =
-          base && !base.startsWith("question-") && !base.startsWith("poll-")
-            ? "Anonymous user"
-            : item.type === "question"
-              ? "Anonymous question"
-              : "Anonymous poll";
-        map.set(key, { key, label, items: [] });
+      let anonymousId: string | null = null;
+      let toUserId: string;
+      if (item.type === "question") {
+        const question = item.data as Question;
+        anonymousId = question.anonymousId ?? null;
+        toUserId = question.toUserId;
+      } else {
+        const poll = item.data as Poll;
+        anonymousId = poll.anonymousId ?? null;
+        toUserId = poll.toUserId;
       }
-      map.get(key)!.items.push(item);
+      const base = anonymousId ?? `legacy-${toUserId}`;
+      if (!map.has(base)) {
+        const suffixSource = anonymousId ?? base;
+        const suffix = suffixSource.slice(-4).toUpperCase();
+        const label = anonymousId ? `Anonymous #${suffix}` : "Legacy anonymous chat";
+        map.set(base, { key: base, label, items: [] });
+      }
+      map.get(base)!.items.push(item);
     };
 
-    newItems.forEach((item, index) => ensureThread(threadMapNew, item, index));
-    answered.forEach((item, index) => ensureThread(threadMapAnswered, item, index));
+    newItems.forEach(item => ensureThread(threadMapNew, item));
+    answered.forEach(item => ensureThread(threadMapAnswered, item));
 
     const newThreads = Array.from(threadMapNew.values());
     const answeredThreads = Array.from(threadMapAnswered.values());
