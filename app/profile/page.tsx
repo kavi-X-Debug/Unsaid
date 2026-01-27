@@ -283,12 +283,12 @@ export default function ProfilePage() {
       typeof crypto !== "undefined" && "randomUUID" in crypto
         ? crypto.randomUUID()
         : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
-    const url = `${profileBaseUrl}?chat=${encodeURIComponent(token)}`;
-    setShareUrl(url);
-    const message = `Check out my Unsaid profile: ${url}`;
-    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    const chatUrl = `${profileBaseUrl}?chat=${encodeURIComponent(token)}`;
+    setShareUrl(chatUrl);
+    const message = `Check out my Unsaid profile: ${chatUrl}`;
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     if (typeof window !== "undefined") {
-      window.open(url, "_blank", "noopener,noreferrer");
+      window.open(waUrl, "_blank", "noopener,noreferrer");
     }
   };
 
