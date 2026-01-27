@@ -23,6 +23,7 @@ export type ReactionCounts = {
 export type Question = {
   id: string;
   toUserId: string;
+  anonymousId?: string | null;
   questionText: string;
   answerText?: string;
   isAnswered: boolean;
@@ -42,6 +43,7 @@ export type PollType = "yes_no" | "multiple_choice";
 export type Poll = {
   id: string;
   toUserId: string;
+  anonymousId?: string | null;
   pollType: PollType;
   questionText?: string;
   options: PollOption[];

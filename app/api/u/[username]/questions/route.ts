@@ -12,6 +12,10 @@ export async function POST(request: NextRequest, context: { params: { username: 
     const body = await request.json();
     const questionText = typeof body.questionText === "string" ? body.questionText.trim() : "";
     const toUserId = typeof body.toUserId === "string" ? body.toUserId : "";
+    const anonymousId =
+      typeof body.anonymousId === "string" && body.anonymousId.length > 0
+        ? body.anonymousId
+        : null;
     if (!questionText || !toUserId) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
@@ -36,6 +40,7 @@ export async function POST(request: NextRequest, context: { params: { username: 
     }
     await addDoc(collection(db, "questions"), {
       toUserId,
+      anonymousId,
       questionText,
       answerText: null,
       isAnswered: false,

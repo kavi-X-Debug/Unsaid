@@ -80,6 +80,12 @@ type InboxItem = {
   data: Question | Poll;
 };
 
+type InboxThread = {
+  key: string;
+  label: string;
+  items: InboxItem[];
+};
+
 export default function InboxPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -254,7 +260,38 @@ export default function InboxPage() {
       const poll = item.data as Poll;
       return poll.isPublished && !poll.isReported;
     });
-    return { newItems, answered };
+    const threadMapNew = new Map<string, InboxThread>();
+    const threadMapAnswered = new Map<string, InboxThread>();
+
+    const ensureThread = (
+      map: Map<string, InboxThread>,
+      item: InboxItem,
+      index: number
+    ) => {
+      const base =
+        item.type === "question"
+          ? (item.data as Question).anonymousId ?? `question-${item.id}`
+          : (item.data as Poll).anonymousId ?? `poll-${item.id}`;
+      let key = base;
+      if (!map.has(key)) {
+        const label =
+          base && !base.startsWith("question-") && !base.startsWith("poll-")
+            ? "Anonymous user"
+            : item.type === "question"
+              ? "Anonymous question"
+              : "Anonymous poll";
+        map.set(key, { key, label, items: [] });
+      }
+      map.get(key)!.items.push(item);
+    };
+
+    newItems.forEach((item, index) => ensureThread(threadMapNew, item, index));
+    answered.forEach((item, index) => ensureThread(threadMapAnswered, item, index));
+
+    const newThreads = Array.from(threadMapNew.values());
+    const answeredThreads = Array.from(threadMapAnswered.values());
+
+    return { newItems, answered, newThreads, answeredThreads };
   }, [filtered]);
 
   const toggleSelect = (id: string) => {
@@ -335,7 +372,7 @@ export default function InboxPage() {
     });
   };
 
-  const renderItem = (item: InboxItem) => {
+  const renderItem = (item: InboxItem, prefixLabel?: string) => {
     if (item.type === "question") {
       const question = item.data as Question;
       const reactionCounts = question.reactionCounts ?? {
@@ -508,24 +545,50 @@ export default function InboxPage() {
 
   const renderTabContent = (key: string) => {
     if (key === "new") {
-      if (grouped.newItems.length === 0) {
+      if (grouped.newThreads.length === 0) {
         return (
           <Card className="p-4 text-sm text-slate-900 border border-dashed border-slate-300 bg-white flex items-center justify-center dark:text-slate-300 dark:border-slate-700/70 dark:bg-slate-900/40">
             Nothing new yet.
           </Card>
         );
       }
-      return <div className="space-y-3">{grouped.newItems.map(renderItem)}</div>;
+      return (
+        <div className="space-y-4">
+          {grouped.newThreads.map(thread => (
+            <div key={thread.key} className="space-y-2">
+              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                {thread.label}
+              </p>
+              <div className="space-y-3">
+                {thread.items.map(item => renderItem(item))}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
     }
     if (key === "answered") {
-      if (grouped.answered.length === 0) {
+      if (grouped.answeredThreads.length === 0) {
         return (
           <Card className="p-4 text-sm text-slate-900 border border-dashed border-slate-300 bg-white flex items-center justify-center dark:text-slate-300 dark:border-slate-700/70 dark:bg-slate-900/40">
             No answered items yet.
           </Card>
         );
       }
-      return <div className="space-y-3">{grouped.answered.map(renderItem)}</div>;
+      return (
+        <div className="space-y-4">
+          {grouped.answeredThreads.map(thread => (
+            <div key={thread.key} className="space-y-2">
+              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                {thread.label}
+              </p>
+              <div className="space-y-3">
+                {thread.items.map(item => renderItem(item))}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
     }
     return null;
   };
