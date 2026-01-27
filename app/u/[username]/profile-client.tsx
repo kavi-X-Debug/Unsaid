@@ -308,13 +308,13 @@ export function ProfilePageClient(props: Props) {
     <main className="min-h-screen px-4 py-10 flex justify-center">
       <div className="w-full max-w-2xl space-y-6">
         <motion.header
-          className="space-y-3 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+          className="space-y-4 flex flex-col items-center"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration, ease: "easeOut" }}
         >
-          <div className="flex items-center gap-4">
-            <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-full bg-sky-500/10 border border-sky-500 flex items-center justify-center text-lg font-semibold text-sky-600 dark:text-sky-300 overflow-hidden shadow-md shadow-sky-500/20">
+          <div className="flex flex-col items-center gap-3">
+            <div className="relative h-24 w-24 rounded-full bg-sky-500/10 border border-sky-500 flex items-center justify-center text-lg font-semibold text-sky-600 dark:text-sky-300 overflow-hidden shadow-md shadow-sky-500/20">
               {props.user.avatarUrl ? (
                 <Image
                   src={props.user.avatarUrl}
@@ -326,10 +326,10 @@ export function ProfilePageClient(props: Props) {
                 avatarLetter
               )}
             </div>
-              <div className="space-y-1">
-                <h1 className="text-2xl font-semibold">{profileTitle}</h1>
-                {displayBio && (
-                  <motion.p
+            <div className="space-y-1 text-center">
+              <h1 className="text-2xl font-semibold">{profileTitle}</h1>
+              {displayBio && (
+                <motion.p
                   className="text-sm text-slate-700 dark:text-slate-300"
                   initial={{ opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -337,31 +337,29 @@ export function ProfilePageClient(props: Props) {
                     duration,
                     ease: "easeOut",
                     delay: prefersReducedMotion ? 0 : 0.05
-                    }}
-                  >
-                    {displayBio}
-                  </motion.p>
-                )}
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center rounded-full px-3 py-1 text-[11px] border bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-900/70 dark:text-slate-200 dark:border-slate-700">
+                  }}
+                >
+                  {displayBio}
+                </motion.p>
+              )}
+              <div className="flex flex-col items-center gap-1 mt-2">
+                <span className="inline-flex items-center rounded-full px-3 py-1 text-[11px] border bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-900/70 dark:text-slate-200 dark:border-slate-700">
                   Anonymous mode
-                  </span>
-                  <span className="text-[11px] text-slate-500">
+                </span>
+                <span className="text-[11px] text-slate-500">
                   Privacy-first Q&A profile
-                  </span>
+                </span>
               </div>
             </div>
           </div>
-          <div className="flex flex-col items-end gap-2 mt-10 sm:mt-0">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleShareProfile}
-              className="text-xs px-3 py-1 h-auto"
-            >
-              {copied ? "Link copied" : "Share profile"}
-            </Button>
-          </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleShareProfile}
+            className="text-xs px-3 py-1 h-auto"
+          >
+            {copied ? "Link copied" : "Share profile"}
+          </Button>
         </motion.header>
 
         <section className="space-y-4">
