@@ -11,6 +11,10 @@ export async function POST(request: NextRequest) {
   const snapshot = await getDocs(collection(db, "questions"));
   let deleted = 0;
   for (const questionDoc of snapshot.docs) {
+    const data = questionDoc.data() as { chatId?: string | null };
+    if (data.chatId) {
+      continue;
+    }
     await deleteDoc(doc(db, "questions", questionDoc.id));
     deleted += 1;
   }
@@ -19,4 +23,3 @@ export async function POST(request: NextRequest) {
     deleted
   });
 }
-

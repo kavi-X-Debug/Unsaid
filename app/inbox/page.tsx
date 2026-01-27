@@ -247,6 +247,9 @@ export default function InboxPage() {
     const newItems = newest.filter(item => {
       if (item.type === "question") {
         const question = item.data as Question;
+        if (!(question as any).chatId) {
+          return false;
+        }
         return !question.isAnswered && !question.isReported;
       }
       const poll = item.data as Poll;
@@ -255,6 +258,9 @@ export default function InboxPage() {
     const answered = newest.filter(item => {
       if (item.type === "question") {
         const question = item.data as Question;
+        if (!(question as any).chatId) {
+          return false;
+        }
         return question.isAnswered && !question.isReported;
       }
       const poll = item.data as Poll;
