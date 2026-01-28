@@ -10,6 +10,7 @@ import { Button } from "../../../components/ui/button";
 import { Textarea } from "../../../components/ui/textarea";
 import { Input } from "../../../components/ui/input";
 import { StaggerContainer } from "../../../components/ui/motion";
+import { Tabs } from "../../../components/ui/tabs";
 import { db } from "../../../lib/firebase";
 import { ReactionBar } from "../../../components/questions/reaction-bar";
 
@@ -50,6 +51,7 @@ export function ProfilePageClient(props: Props) {
   const [polls, setPolls] = useState<Poll[]>(props.polls);
   const [chatQuestions, setChatQuestions] = useState<Question[]>([]);
   const [anonymousSessionId, setAnonymousSessionId] = useState<string | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
 
   const prefersReducedMotion = useReducedMotion();
   const duration = prefersReducedMotion ? 0 : 0.18;
@@ -189,7 +191,7 @@ export function ProfilePageClient(props: Props) {
       items.sort((a, b) => {
         const aDate = a.createdAt?.toMillis?.() ?? 0;
         const bDate = b.createdAt?.toMillis?.() ?? 0;
-        return aDate - bDate;
+        return bDate - aDate;
       });
       setChatQuestions(items);
     });
@@ -380,68 +382,6 @@ export function ProfilePageClient(props: Props) {
             </Button>
           </Card>
 
-          {anonymousSessionId && (
-            <Card className="p-4 space-y-3 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow">
-              <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                Your conversation
-              </h2>
-              {chatQuestions.length === 0 && (
-                <p className="text-sm text-slate-600 dark:text-slate-500">
-                  Your messages and replies will appear here.
-                </p>
-              )}
-              {chatQuestions.length > 0 && (
-                <div className="space-y-3">
-                  {chatQuestions.map(question => {
-                    const sentTime = formatTime(question.createdAt);
-                    const repliedTime = formatTime((question as any).answeredAt);
-                    return (
-                      <div
-                        key={question.id}
-                        className="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2 dark:border-slate-800 dark:bg-slate-900/60"
-                      >
-                        <p className="text-sm text-slate-800 dark:text-slate-100 whitespace-pre-wrap">
-                          {question.questionText}
-                        </p>
-                        {question.isAnswered && question.answerText && (
-                          <div className="space-y-2">
-                            <div className="rounded-lg bg-white border border-slate-200 p-2 text-sm text-slate-800 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100">
-                              {question.answerText}
-                            </div>
-                            <ReactionBar
-                              questionId={question.id}
-                              initialCounts={
-                                question.reactionCounts ?? {
-                                  heart: 0,
-                                  laugh: 0,
-                                  wow: 0
-                                }
-                              }
-                            />
-                          </div>
-                        )}
-                        {(sentTime || repliedTime) && (
-                          <div className="flex justify-end text-[11px] text-slate-500 dark:text-slate-500">
-                            <span>
-                              {sentTime && `Sent ${sentTime}`}
-                              {sentTime && repliedTime && " • "}
-                              {repliedTime && `Replied ${repliedTime}`}
-                            </span>
-                          </div>
-                        )}
-                        {!question.isAnswered && (
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                            Waiting for a reply
-                          </p>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </Card>
-          )}
-
           <Card className="p-4 space-y-3 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow">
             <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
               Send a poll
@@ -508,159 +448,268 @@ export function ProfilePageClient(props: Props) {
           {error && <p className="text-sm text-rose-400">{error}</p>}
         </section>
 
-        <motion.section
-          className="space-y-3"
-          initial={{ opacity: 0, y: 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration, ease: "easeOut" }}
-        >
-          <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-            Published polls
-          </h2>
-          {polls.length === 0 && (
-            <p className="text-sm text-slate-600 dark:text-slate-500">No polls yet.</p>
-          )}
-          <StaggerContainer>
-            {polls.map(poll => (
-              <Card
-                key={poll.id}
-                className="p-4 space-y-3 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow"
-              >
-                <p className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
-                  {poll.questionText ?? "Poll"}
-                </p>
-                {poll.pollType === "yes_no" ? (
-                  <div className="space-y-3">
-                    <div className="space-y-2">
-                      {poll.options.map((option, index) => {
-                        const hasVoted = pollVotes[poll.id] != null;
-                        const isChosen = pollVotes[poll.id] === index;
-                        const isPending =
-                          pendingVotes[poll.id] != null && pendingVotes[poll.id] === index;
-                        const ownerChosen =
-                          typeof poll.ownerSelection === "number" &&
-                          poll.ownerSelection === index;
-                        const optionTextClass = ownerChosen
-                          ? "text-sky-700 font-semibold dark:text-sky-300"
-                          : isChosen
-                            ? "text-emerald-400 font-medium dark:text-emerald-300"
-                            : isPending
-                              ? "text-slate-900 font-medium dark:text-slate-100"
-                              : "text-slate-800 dark:text-slate-200";
+        {anonymousSessionId && (
+          <motion.section
+            className="space-y-3"
+            initial={{ opacity: 0, y: 8 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration, ease: "easeOut" }}
+          >
+            <Card className="p-4 space-y-4 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow">
+              <div className="flex items-center justify-between gap-2">
+                <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                  Previous messages
+                </h2>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="text-xs px-3 py-1 h-auto"
+                  onClick={() => setShowHistory(previous => !previous)}
+                >
+                  {showHistory ? "Hide" : "See previous messages"}
+                </Button>
+              </div>
+              {showHistory && (
+                <Tabs
+                  tabs={[
+                    { key: "messages", label: "Messages" },
+                    { key: "polls", label: "Polls" }
+                  ]}
+                  initialKey="messages"
+                  renderContent={activeKey => {
+                    if (activeKey === "messages") {
+                      if (chatQuestions.length === 0) {
                         return (
-                          <button
-                            key={option.optionText}
-                            type="button"
-                            disabled={hasVoted}
-                            onClick={() => {
-                              if (hasVoted) {
-                                return;
-                              }
-                              setPendingVotes(previous => ({
-                                ...previous,
-                                [poll.id]: index
-                              }));
-                            }}
-                            className="w-full text-left"
-                          >
-                            <div className="flex items-center justify-between text-xs mb-1">
-                              <span className={optionTextClass}>{option.optionText}</span>
-                              {ownerChosen && (
-                                <span className="ml-1 text-[10px] text-sky-400">
-                                  Owner&apos;s choice
-                                </span>
-                              )}
-                            </div>
-                          </button>
+                          <p className="text-sm text-slate-600 dark:text-slate-500">
+                            Your messages and replies will appear here.
+                          </p>
                         );
-                      })}
-                    </div>
-                    <Button
-                      type="button"
-                      disabled={
-                        pollVotes[poll.id] != null || pendingVotes[poll.id] == null
                       }
-                      onClick={() => {
-                        const pendingIndex = pendingVotes[poll.id];
-                        if (pendingIndex == null || pollVotes[poll.id] != null) {
-                          return;
-                        }
-                        handleVote(poll.id, pendingIndex);
-                      }}
-                      fullWidth
-                    >
-                      {pollVotes[poll.id] != null ? "Vote submitted" : "Confirm vote"}
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <div className="space-y-2">
-                      {poll.options.map((option, index) => {
-                        const hasVoted = pollVotes[poll.id] != null;
-                        const isChosen = pollVotes[poll.id] === index;
-                        const isPending =
-                          pendingVotes[poll.id] != null && pendingVotes[poll.id] === index;
-                        const ownerChosen =
-                          typeof poll.ownerSelection === "number" &&
-                          poll.ownerSelection === index;
-                        const optionTextClass = ownerChosen
-                          ? "text-sky-700 font-semibold dark:text-sky-300"
-                          : isChosen
-                            ? "text-emerald-400 font-medium dark:text-emerald-300"
-                            : isPending
-                              ? "text-slate-900 font-medium dark:text-slate-100"
-                              : "text-slate-800 dark:text-slate-200";
-                        return (
-                          <button
-                            key={option.optionText}
-                            type="button"
-                            disabled={hasVoted}
-                            onClick={() => {
-                              if (hasVoted) {
-                                return;
-                              }
-                              setPendingVotes(previous => ({
-                                ...previous,
-                                [poll.id]: index
-                              }));
-                            }}
-                            className="w-full text-left"
+                      return (
+                        <div className="space-y-3">
+                          {chatQuestions.map(question => {
+                            const sentTime = formatTime(question.createdAt);
+                            const repliedTime = formatTime(
+                              (question as any).answeredAt
+                            );
+                            return (
+                              <div
+                                key={question.id}
+                                className="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2 dark:border-slate-800 dark:bg-slate-900/60"
+                              >
+                                <p className="text-sm text-slate-800 dark:text-slate-100 whitespace-pre-wrap">
+                                  {question.questionText}
+                                </p>
+                                {question.isAnswered && question.answerText && (
+                                  <div className="space-y-2">
+                                    <div className="rounded-lg bg-white border border-slate-200 p-2 text-sm text-slate-800 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100">
+                                      {question.answerText}
+                                    </div>
+                                    <ReactionBar
+                                      questionId={question.id}
+                                      initialCounts={
+                                        question.reactionCounts ?? {
+                                          heart: 0,
+                                          laugh: 0,
+                                          wow: 0
+                                        }
+                                      }
+                                    />
+                                  </div>
+                                )}
+                                {(sentTime || repliedTime) && (
+                                  <div className="flex justify-end text-[11px] text-slate-500 dark:text-slate-500">
+                                    <span>
+                                      {sentTime && `Sent ${sentTime}`}
+                                      {sentTime && repliedTime && " • "}
+                                      {repliedTime && `Replied ${repliedTime}`}
+                                    </span>
+                                  </div>
+                                )}
+                                {!question.isAnswered && (
+                                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                                    Waiting for a reply
+                                  </p>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    }
+                    if (polls.length === 0) {
+                      return (
+                        <p className="text-sm text-slate-600 dark:text-slate-500">
+                          No polls yet.
+                        </p>
+                      );
+                    }
+                    return (
+                      <StaggerContainer>
+                        {polls.map(poll => (
+                          <Card
+                            key={poll.id}
+                            className="p-4 space-y-3 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow"
                           >
-                            <div className="flex items-center justify-between text-xs mb-1">
-                              <span className={optionTextClass}>{option.optionText}</span>
-                              {ownerChosen && (
-                                <span className="ml-1 text-[10px] text-sky-400">
-                                  Owner&apos;s choice
-                                </span>
-                              )}
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <Button
-                      type="button"
-                      disabled={
-                        pollVotes[poll.id] != null || pendingVotes[poll.id] == null
-                      }
-                      onClick={() => {
-                        const pendingIndex = pendingVotes[poll.id];
-                        if (pendingIndex == null || pollVotes[poll.id] != null) {
-                          return;
-                        }
-                        handleVote(poll.id, pendingIndex);
-                      }}
-                      fullWidth
-                    >
-                      {pollVotes[poll.id] != null ? "Vote submitted" : "Confirm vote"}
-                    </Button>
-                  </div>
-                )}
-              </Card>
-            ))}
-          </StaggerContainer>
-        </motion.section>
+                            <p className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
+                              {poll.questionText ?? "Poll"}
+                            </p>
+                            {poll.pollType === "yes_no" ? (
+                              <div className="space-y-3">
+                                <div className="space-y-2">
+                                  {poll.options.map((option, index) => {
+                                    const hasVoted = pollVotes[poll.id] != null;
+                                    const isChosen = pollVotes[poll.id] === index;
+                                    const isPending =
+                                      pendingVotes[poll.id] != null &&
+                                      pendingVotes[poll.id] === index;
+                                    const ownerChosen =
+                                      typeof poll.ownerSelection === "number" &&
+                                      poll.ownerSelection === index;
+                                    const optionTextClass = ownerChosen
+                                      ? "text-sky-700 font-semibold dark:text-sky-300"
+                                      : isChosen
+                                        ? "text-emerald-400 font-medium dark:text-emerald-300"
+                                        : isPending
+                                          ? "text-slate-900 font-medium dark:text-slate-100"
+                                          : "text-slate-800 dark:text-slate-200";
+                                    return (
+                                      <button
+                                        key={option.optionText}
+                                        type="button"
+                                        disabled={hasVoted}
+                                        onClick={() => {
+                                          if (hasVoted) {
+                                            return;
+                                          }
+                                          setPendingVotes(previous => ({
+                                            ...previous,
+                                            [poll.id]: index
+                                          }));
+                                        }}
+                                        className="w-full text-left"
+                                      >
+                                        <div className="flex items-center justify-between text-xs mb-1">
+                                          <span className={optionTextClass}>
+                                            {option.optionText}
+                                          </span>
+                                          {ownerChosen && (
+                                            <span className="ml-1 text-[10px] text-sky-400">
+                                              Owner&apos;s choice
+                                            </span>
+                                          )}
+                                        </div>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                                <Button
+                                  type="button"
+                                  disabled={
+                                    pollVotes[poll.id] != null ||
+                                    pendingVotes[poll.id] == null
+                                  }
+                                  onClick={() => {
+                                    const pendingIndex = pendingVotes[poll.id];
+                                    if (
+                                      pendingIndex == null ||
+                                      pollVotes[poll.id] != null
+                                    ) {
+                                      return;
+                                    }
+                                    handleVote(poll.id, pendingIndex);
+                                  }}
+                                  fullWidth
+                                >
+                                  {pollVotes[poll.id] != null
+                                    ? "Vote submitted"
+                                    : "Confirm vote"}
+                                </Button>
+                              </div>
+                            ) : (
+                              <div className="space-y-3">
+                                <div className="space-y-2">
+                                  {poll.options.map((option, index) => {
+                                    const hasVoted = pollVotes[poll.id] != null;
+                                    const isChosen = pollVotes[poll.id] === index;
+                                    const isPending =
+                                      pendingVotes[poll.id] != null &&
+                                      pendingVotes[poll.id] === index;
+                                    const ownerChosen =
+                                      typeof poll.ownerSelection === "number" &&
+                                      poll.ownerSelection === index;
+                                    const optionTextClass = ownerChosen
+                                      ? "text-sky-700 font-semibold dark:text-sky-300"
+                                      : isChosen
+                                        ? "text-emerald-400 font-medium dark:text-emerald-300"
+                                        : isPending
+                                          ? "text-slate-900 font-medium dark:text-slate-100"
+                                          : "text-slate-800 dark:text-slate-200";
+                                    return (
+                                      <button
+                                        key={option.optionText}
+                                        type="button"
+                                        disabled={hasVoted}
+                                        onClick={() => {
+                                          if (hasVoted) {
+                                            return;
+                                          }
+                                          setPendingVotes(previous => ({
+                                            ...previous,
+                                            [poll.id]: index
+                                          }));
+                                        }}
+                                        className="w-full text-left"
+                                      >
+                                        <div className="flex items-center justify-between text-xs mb-1">
+                                          <span className={optionTextClass}>
+                                            {option.optionText}
+                                          </span>
+                                          {ownerChosen && (
+                                            <span className="ml-1 text-[10px] text-sky-400">
+                                              Owner&apos;s choice
+                                            </span>
+                                          )}
+                                        </div>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                                <Button
+                                  type="button"
+                                  disabled={
+                                    pollVotes[poll.id] != null ||
+                                    pendingVotes[poll.id] == null
+                                  }
+                                  onClick={() => {
+                                    const pendingIndex = pendingVotes[poll.id];
+                                    if (
+                                      pendingIndex == null ||
+                                      pollVotes[poll.id] != null
+                                    ) {
+                                      return;
+                                    }
+                                    handleVote(poll.id, pendingIndex);
+                                  }}
+                                  fullWidth
+                                >
+                                  {pollVotes[poll.id] != null
+                                    ? "Vote submitted"
+                                    : "Confirm vote"}
+                                </Button>
+                              </div>
+                            )}
+                          </Card>
+                        ))}
+                      </StaggerContainer>
+                    );
+                  }}
+                />
+              )}
+            </Card>
+          </motion.section>
+        )}
       </div>
     </main>
   );
