@@ -12,16 +12,13 @@ const baseUrl = "https://unsaid.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
-  title: {
-    default: "Unsaid",
-    template: "%s | Unsaid"
-  },
+  title: "UnSaid | Anonymous Messege Sender",
   description: "Anonymous Q&A with polls and reactions",
   openGraph: {
-    title: "Unsaid",
+    title: "UnSaid | Anonymous Messege Sender",
     description: "Anonymous Q&A with polls and reactions",
     url: baseUrl,
-    siteName: "Unsaid",
+    siteName: "UnSaid",
     images: [
       {
         url: "/favicon.png",
@@ -34,7 +31,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Unsaid",
+    title: "UnSaid | Anonymous Messege Sender",
     description: "Anonymous Q&A with polls and reactions",
     images: ["/favicon.png"]
   },
