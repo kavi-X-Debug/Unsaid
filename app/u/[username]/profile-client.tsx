@@ -561,28 +561,22 @@ export function ProfilePageClient(props: Props) {
                         );
                       })}
                     </div>
-                    <Button
-                      type="button"
-                      disabled={
-                        pollVotes[latestPoll.id] != null ||
-                        pendingVotes[latestPoll.id] == null
-                      }
-                      onClick={() => {
-                        const pendingIndex = pendingVotes[latestPoll.id];
-                        if (
-                          pendingIndex == null ||
-                          pollVotes[latestPoll.id] != null
-                        ) {
-                          return;
-                        }
-                        handleVote(latestPoll.id, pendingIndex);
-                      }}
-                      fullWidth
-                    >
-                      {pollVotes[latestPoll.id] != null
-                        ? "Vote submitted"
-                        : "Confirm vote"}
-                    </Button>
+                    {pollVotes[latestPoll.id] == null && (
+                      <Button
+                        type="button"
+                        disabled={pendingVotes[latestPoll.id] == null}
+                        onClick={() => {
+                          const pendingIndex = pendingVotes[latestPoll.id];
+                          if (pendingIndex == null) {
+                            return;
+                          }
+                          handleVote(latestPoll.id, pendingIndex);
+                        }}
+                        fullWidth
+                      >
+                        Confirm vote
+                      </Button>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -631,28 +625,22 @@ export function ProfilePageClient(props: Props) {
                         );
                       })}
                     </div>
-                    <Button
-                      type="button"
-                      disabled={
-                        pollVotes[latestPoll.id] != null ||
-                        pendingVotes[latestPoll.id] == null
-                      }
-                      onClick={() => {
-                        const pendingIndex = pendingVotes[latestPoll.id];
-                        if (
-                          pendingIndex == null ||
-                          pollVotes[latestPoll.id] != null
-                        ) {
-                          return;
-                        }
-                        handleVote(latestPoll.id, pendingIndex);
-                      }}
-                      fullWidth
-                    >
-                      {pollVotes[latestPoll.id] != null
-                        ? "Vote submitted"
-                        : "Confirm vote"}
-                    </Button>
+                    {pollVotes[latestPoll.id] == null && (
+                      <Button
+                        type="button"
+                        disabled={pendingVotes[latestPoll.id] == null}
+                        onClick={() => {
+                          const pendingIndex = pendingVotes[latestPoll.id];
+                          if (pendingIndex == null) {
+                            return;
+                          }
+                          handleVote(latestPoll.id, pendingIndex);
+                        }}
+                        fullWidth
+                      >
+                        Confirm vote
+                      </Button>
+                    )}
                   </div>
                 )}
               </div>
@@ -822,28 +810,22 @@ export function ProfilePageClient(props: Props) {
                                     );
                                   })}
                                 </div>
-                                <Button
-                                  type="button"
-                                  disabled={
-                                    pollVotes[poll.id] != null ||
-                                    pendingVotes[poll.id] == null
-                                  }
-                                  onClick={() => {
-                                    const pendingIndex = pendingVotes[poll.id];
-                                    if (
-                                      pendingIndex == null ||
-                                      pollVotes[poll.id] != null
-                                    ) {
-                                      return;
-                                    }
-                                    handleVote(poll.id, pendingIndex);
-                                  }}
-                                  fullWidth
-                                >
-                                  {pollVotes[poll.id] != null
-                                    ? "Vote submitted"
-                                    : "Confirm vote"}
-                                </Button>
+                                {pollVotes[poll.id] == null && (
+                                  <Button
+                                    type="button"
+                                    disabled={pendingVotes[poll.id] == null}
+                                    onClick={() => {
+                                      const pendingIndex = pendingVotes[poll.id];
+                                      if (pendingIndex == null) {
+                                        return;
+                                      }
+                                      handleVote(poll.id, pendingIndex);
+                                    }}
+                                    fullWidth
+                                  >
+                                    Confirm vote
+                                  </Button>
+                                )}
                               </div>
                             ) : (
                               <div className="space-y-3">
@@ -894,28 +876,22 @@ export function ProfilePageClient(props: Props) {
                                     );
                                   })}
                                 </div>
-                                <Button
-                                  type="button"
-                                  disabled={
-                                    pollVotes[poll.id] != null ||
-                                    pendingVotes[poll.id] == null
-                                  }
-                                  onClick={() => {
-                                    const pendingIndex = pendingVotes[poll.id];
-                                    if (
-                                      pendingIndex == null ||
-                                      pollVotes[poll.id] != null
-                                    ) {
-                                      return;
-                                    }
-                                    handleVote(poll.id, pendingIndex);
-                                  }}
-                                  fullWidth
-                                >
-                                  {pollVotes[poll.id] != null
-                                    ? "Vote submitted"
-                                    : "Confirm vote"}
-                                </Button>
+                                {pollVotes[poll.id] == null && (
+                                  <Button
+                                    type="button"
+                                    disabled={pendingVotes[poll.id] == null}
+                                    onClick={() => {
+                                      const pendingIndex = pendingVotes[poll.id];
+                                      if (pendingIndex == null) {
+                                        return;
+                                      }
+                                      handleVote(poll.id, pendingIndex);
+                                    }}
+                                    fullWidth
+                                  >
+                                    Confirm vote
+                                  </Button>
+                                )}
                               </div>
                             )}
                           </Card>

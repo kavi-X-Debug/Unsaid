@@ -84,9 +84,22 @@ export default function LandingPage() {
               Anonymous questions made safe
             </p>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight">
-              <span className="bg-gradient-to-r from-sky-400 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+              <motion.span
+                initial={
+                  prefersReducedMotion
+                    ? undefined
+                    : { opacity: 0, y: 8 }
+                }
+                animate={
+                  prefersReducedMotion
+                    ? undefined
+                    : { opacity: 1, y: 0 }
+                }
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="bg-gradient-to-r from-sky-400 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent inline-block"
+              >
                 One link for honest, anonymous questions.
-              </span>
+              </motion.span>
               <span className="block text-slate-900 dark:text-slate-100">
                 Separate chats that stay private to each visitor.
               </span>
