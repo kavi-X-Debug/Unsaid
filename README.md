@@ -7,6 +7,11 @@ It allows users to share one public profile link and receive anonymous messages 
 The platform focuses on **privacy**, **engagement**, and **simplicity**, using a static profile link combined with browser-based anonymous sessions.
 
 ##
+🌐 Live Demo
+
+🚀 Unsaid is live here:
+https://unsaid-kappa.vercel.app/
+##
 ## ✨ Key Features
 ---
 ##
