@@ -12,14 +12,37 @@ type Props = {
 
 export function generateMetadata(props: Props): Metadata {
   const username = props.params.username.toLowerCase();
-  const title = `${username} • Unsaid profile`;
-  const description = `Send anonymous questions and polls to @${username} on Unsaid.`;
+  const displayUsername = props.params.username;
+  const baseUrl = "https://unsaid.app";
+  const url = `${baseUrl}/u/${username}`;
+  const title = `Send Anonymous Messages to ${displayUsername} | Unsaid`;
+  const description = `Send anonymous messages, react to messages, and vote in polls on ${displayUsername}'s Unsaid profile.`;
   return {
     title,
     description,
+    alternates: {
+      canonical: url
+    },
     openGraph: {
       title,
-      description
+      description,
+      url,
+      siteName: "Unsaid",
+      images: [
+        {
+          url: `${baseUrl}/favicon.png`,
+          width: 512,
+          height: 512,
+          alt: "Unsaid"
+        }
+      ],
+      type: "website"
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [`${baseUrl}/favicon.png`]
     }
   };
 }

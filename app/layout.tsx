@@ -8,9 +8,36 @@ import { ThemeToggle } from "../components/theme/theme-toggle";
 import { PageTransition } from "../components/ui/motion";
 import { Navbar } from "../components/ui/navbar";
 
+const baseUrl = "https://unsaid.app";
+
 export const metadata: Metadata = {
-  title: "Unsaid",
+  metadataBase: new URL(baseUrl),
+  title: {
+    default: "Unsaid",
+    template: "%s | Unsaid"
+  },
   description: "Anonymous Q&A with polls and reactions",
+  openGraph: {
+    title: "Unsaid",
+    description: "Anonymous Q&A with polls and reactions",
+    url: baseUrl,
+    siteName: "Unsaid",
+    images: [
+      {
+        url: "/favicon.png",
+        width: 512,
+        height: 512,
+        alt: "Unsaid"
+      }
+    ],
+    type: "website"
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Unsaid",
+    description: "Anonymous Q&A with polls and reactions",
+    images: ["/favicon.png"]
+  },
   icons: {
     icon: "/favicon.png",
     shortcut: "/favicon.png",

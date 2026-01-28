@@ -111,7 +111,7 @@ export function ProfilePageClient(props: Props) {
       const href =
         typeof window !== "undefined" && window.location
           ? window.location.href
-          : `https://unsaid.app/profile/${props.username}`;
+          : `https://unsaid.app/u/${props.username.toLowerCase()}`;
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(href);
         setCopied(true);

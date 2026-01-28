@@ -281,6 +281,80 @@ export default function LandingPage() {
         </div>
       </motion.section>
       <motion.section
+        className="border-t border-slate-200 bg-white/90 dark:border-slate-800 dark:bg-slate-950/80"
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: sectionDuration, ease: "easeOut" }}
+      >
+        <div className="mx-auto max-w-5xl px-4 py-12 space-y-8">
+          <div className="grid gap-10 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:items-start">
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+                How Unsaid works
+              </h2>
+              <ol className="space-y-3 text-sm text-slate-700 dark:text-slate-300">
+                <li>
+                  Create your profile and share your unique Unsaid link anywhere you talk to your
+                  audience.
+                </li>
+                <li>
+                  Visitors send anonymous questions or polls. Each browser session gets its own
+                  private chat thread.
+                </li>
+                <li>
+                  You read and reply from a private inbox, then choose which answers or polls to
+                  publish.
+                </li>
+              </ol>
+            </div>
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  Privacy-first by design
+                </h3>
+                <ul className="space-y-2 text-xs text-slate-700 dark:text-slate-300">
+                  <li>Questions are tied to anonymous sessions, not real names or email addresses.</li>
+                  <li>
+                    Positive-only settings and reporting tools help keep your inbox free from
+                    abuse.
+                  </li>
+                  <li>
+                    You decide what is published. Anything you leave unanswered stays private.
+                  </li>
+                </ul>
+              </div>
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  Quick answers
+                </h3>
+                <dl className="space-y-2 text-xs text-slate-700 dark:text-slate-300">
+                  <div>
+                    <dt className="font-medium">Is my identity ever shown?</dt>
+                    <dd className="text-slate-600 dark:text-slate-400">
+                      No. Unsaid never attaches your name or email to the questions you send.
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium">Can I use Unsaid on social media?</dt>
+                    <dd className="text-slate-600 dark:text-slate-400">
+                      Yes. Share your link on Instagram, X, TikTok, Discord, or anywhere else you
+                      connect with people.
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium">Do I have to answer everything?</dt>
+                    <dd className="text-slate-600 dark:text-slate-400">
+                      No. You can ignore or archive anything that does not feel right to answer.
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+      <motion.section
         className="border-t border-slate-200 bg-slate-50 dark:border-slate-900/70 dark:bg-black/90"
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
