@@ -45,6 +45,7 @@ export function ProfilePageClient(props: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pollVotes, setPollVotes] = useState<Record<string, number | null>>({});
+  const [pendingVotes, setPendingVotes] = useState<Record<string, number | null>>({});
   const [polls, setPolls] = useState<Poll[]>(props.polls);
   const [chatQuestions, setChatQuestions] = useState<Question[]>([]);
   const [anonymousSessionId, setAnonymousSessionId] = useState<string | null>(null);
@@ -516,38 +517,103 @@ export function ProfilePageClient(props: Props) {
                 <p className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
                   {poll.questionText ?? "Poll"}
                 </p>
-                <div className="space-y-2">
-                  {poll.options.map((option, index) => {
-                    const hasVoted = pollVotes[poll.id] != null;
-                    const isChosen = pollVotes[poll.id] === index;
-                    const ownerChosen =
-                      typeof poll.ownerSelection === "number" &&
-                      poll.ownerSelection === index;
-                    const optionTextClass = ownerChosen
-                      ? "text-sky-700 font-semibold dark:text-sky-300"
-                      : isChosen
-                        ? "text-emerald-400 font-medium dark:text-emerald-300"
-                        : "text-slate-800 dark:text-slate-200";
-                    return (
-                      <button
-                        key={option.optionText}
-                        type="button"
-                        disabled={hasVoted}
-                        onClick={() => handleVote(poll.id, index)}
-                        className="w-full text-left"
-                      >
-                        <div className="flex items-center justify-between text-xs mb-1">
-                          <span className={optionTextClass}>{option.optionText}</span>
-                          {ownerChosen && (
-                            <span className="ml-1 text-[10px] text-sky-400">
-                              Owner&apos;s choice
-                            </span>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
+                {poll.pollType === "yes_no" ? (
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      {poll.options.map((option, index) => {
+                        const hasVoted = pollVotes[poll.id] != null;
+                        const isChosen = pollVotes[poll.id] === index;
+                        const isPending =
+                          pendingVotes[poll.id] != null && pendingVotes[poll.id] === index;
+                        const ownerChosen =
+                          typeof poll.ownerSelection === "number" &&
+                          poll.ownerSelection === index;
+                        const optionTextClass = ownerChosen
+                          ? "text-sky-700 font-semibold dark:text-sky-300"
+                          : isChosen
+                            ? "text-emerald-400 font-medium dark:text-emerald-300"
+                            : isPending
+                              ? "text-slate-900 font-medium dark:text-slate-100"
+                              : "text-slate-800 dark:text-slate-200";
+                        return (
+                          <button
+                            key={option.optionText}
+                            type="button"
+                            disabled={hasVoted}
+                            onClick={() => {
+                              if (hasVoted) {
+                                return;
+                              }
+                              setPendingVotes(previous => ({
+                                ...previous,
+                                [poll.id]: index
+                              }));
+                            }}
+                            className="w-full text-left"
+                          >
+                            <div className="flex items-center justify-between text-xs mb-1">
+                              <span className={optionTextClass}>{option.optionText}</span>
+                              {ownerChosen && (
+                                <span className="ml-1 text-[10px] text-sky-400">
+                                  Owner&apos;s choice
+                                </span>
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <Button
+                      type="button"
+                      disabled={
+                        pollVotes[poll.id] != null || pendingVotes[poll.id] == null
+                      }
+                      onClick={() => {
+                        const pendingIndex = pendingVotes[poll.id];
+                        if (pendingIndex == null || pollVotes[poll.id] != null) {
+                          return;
+                        }
+                        handleVote(poll.id, pendingIndex);
+                      }}
+                      fullWidth
+                    >
+                      {pollVotes[poll.id] != null ? "Vote submitted" : "Confirm vote"}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {poll.options.map((option, index) => {
+                      const hasVoted = pollVotes[poll.id] != null;
+                      const isChosen = pollVotes[poll.id] === index;
+                      const ownerChosen =
+                        typeof poll.ownerSelection === "number" &&
+                        poll.ownerSelection === index;
+                      const optionTextClass = ownerChosen
+                        ? "text-sky-700 font-semibold dark:text-sky-300"
+                        : isChosen
+                          ? "text-emerald-400 font-medium dark:text-emerald-300"
+                          : "text-slate-800 dark:text-slate-200";
+                      return (
+                        <button
+                          key={option.optionText}
+                          type="button"
+                          disabled={hasVoted}
+                          onClick={() => handleVote(poll.id, index)}
+                          className="w-full text-left"
+                        >
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className={optionTextClass}>{option.optionText}</span>
+                            {ownerChosen && (
+                              <span className="ml-1 text-[10px] text-sky-400">
+                                Owner&apos;s choice
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </Card>
             ))}
           </StaggerContainer>

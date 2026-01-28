@@ -25,6 +25,7 @@ import { auth, db } from "../../lib/firebase";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
+import DefaultAvatar from "../../Images/default.png";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -65,6 +66,7 @@ export default function SignupPage() {
       uid: user.uid,
       username: candidate,
       bio: null,
+      avatarUrl: DefaultAvatar.src,
       createdAt: serverTimestamp(),
       settings: {
         positiveOnlyMode: false

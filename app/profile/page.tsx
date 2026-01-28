@@ -31,6 +31,7 @@ import Avatar5 from "../../Images/Gemini_Generated_Image_i968xni968xni968 (1).pn
 import Avatar6 from "../../Images/Gemini_Generated_Image_mw8kbmmw8kbmmw8k (1).png";
 import Avatar7 from "../../Images/Gemini_Generated_Image_w2jdqew2jdqew2jd (1).png";
 import Avatar8 from "../../Images/Gemini_Generated_Image_wocmn5wocmn5wocm (1).png";
+import DefaultAvatar from "../../Images/default.png";
 
 const avatarOptions = [Avatar1, Avatar2, Avatar3, Avatar4, Avatar5, Avatar6, Avatar7, Avatar8];
 
@@ -118,6 +119,7 @@ export default function ProfilePage() {
           uid: user.uid,
           username: candidate,
           bio: null,
+          avatarUrl: DefaultAvatar.src,
           profileViews: 0,
           createdAt: serverTimestamp(),
           settings: {
@@ -127,8 +129,8 @@ export default function ProfilePage() {
         nextUsername = candidate;
         setBioDraft("");
         setSavedBio("");
-        setAvatarUrl(null);
-        setAvatarDraft(null);
+        setAvatarUrl(DefaultAvatar.src);
+        setAvatarDraft(DefaultAvatar.src);
       }
       setUsername(nextUsername);
       setUsernameDraft(nextUsername ?? "");
@@ -446,11 +448,6 @@ export default function ProfilePage() {
                 {joinedText && (
                   <p className="text-xs text-slate-600 dark:text-slate-400">
                     Joined {joinedText}
-                  </p>
-                )}
-                {viewCount != null && (
-                  <p className="text-xs text-slate-600 dark:text-slate-400">
-                    Profile views: {viewCount.toLocaleString()}
                   </p>
                 )}
               </>

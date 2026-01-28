@@ -26,6 +26,7 @@ import { Textarea } from "../../components/ui/textarea";
 import { Input } from "../../components/ui/input";
 import { Modal } from "../../components/ui/modal";
 import loadingAnimationData from "../../loading.json";
+import DefaultAvatar from "../../Images/default.png";
 
 function LoadingAnimation() {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -194,6 +195,7 @@ export default function InboxPage() {
             uid: user.uid,
             username: candidate,
             bio: null,
+            avatarUrl: DefaultAvatar.src,
             createdAt: serverTimestamp(),
             settings: {
               positiveOnlyMode: false
