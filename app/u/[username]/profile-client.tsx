@@ -11,6 +11,7 @@ import { Textarea } from "../../../components/ui/textarea";
 import { Input } from "../../../components/ui/input";
 import { StaggerContainer } from "../../../components/ui/motion";
 import { db } from "../../../lib/firebase";
+import { ReactionBar } from "../../../components/questions/reaction-bar";
 
 type PollDraftType = "yes_no" | "multiple_choice";
 
@@ -403,8 +404,20 @@ export function ProfilePageClient(props: Props) {
                           {question.questionText}
                         </p>
                         {question.isAnswered && question.answerText && (
-                          <div className="rounded-lg bg-white border border-slate-200 p-2 text-sm text-slate-800 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100">
-                            {question.answerText}
+                          <div className="space-y-2">
+                            <div className="rounded-lg bg-white border border-slate-200 p-2 text-sm text-slate-800 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100">
+                              {question.answerText}
+                            </div>
+                            <ReactionBar
+                              questionId={question.id}
+                              initialCounts={
+                                question.reactionCounts ?? {
+                                  heart: 0,
+                                  laugh: 0,
+                                  wow: 0
+                                }
+                              }
+                            />
                           </div>
                         )}
                         {(sentTime || repliedTime) && (
