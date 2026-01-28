@@ -96,9 +96,17 @@ export default function LandingPage() {
                     : { opacity: 1, y: 0 }
                 }
                 transition={{ duration: 0.6, ease: "easeOut" }}
-                className="bg-gradient-to-r from-sky-400 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent inline-block"
+                className="hero-aurora-title"
               >
-                One link for honest, anonymous questions.
+                <span className="relative z-10 bg-gradient-to-r from-sky-400 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent inline-block">
+                  One link for honest, anonymous questions.
+                </span>
+                <span className="hero-aurora-layer">
+                  <span className="hero-aurora-item" />
+                  <span className="hero-aurora-item" />
+                  <span className="hero-aurora-item" />
+                  <span className="hero-aurora-item" />
+                </span>
               </motion.span>
               <span className="block text-slate-900 dark:text-slate-100">
                 Separate chats that stay private to each visitor.
