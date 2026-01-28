@@ -308,6 +308,16 @@ export function ProfilePageClient(props: Props) {
     }
   };
 
+  const getMillis = (timestamp: any) => timestamp?.toMillis?.() ?? 0;
+  const latestQuestion = chatQuestions.length > 0 ? chatQuestions[0] : null;
+  const latestPoll = polls.length > 0 ? polls[0] : null;
+  const latestItemIsQuestion =
+    !!latestQuestion &&
+    (!latestPoll || getMillis((latestQuestion as any).createdAt) >= getMillis((latestPoll as any).createdAt));
+  const latestItemIsPoll =
+    !!latestPoll &&
+    (!latestQuestion || getMillis((latestPoll as any).createdAt) > getMillis((latestQuestion as any).createdAt));
+
   return (
     <main className="min-h-screen px-4 py-10 flex justify-center">
       <div className="w-full max-w-2xl space-y-6">
@@ -448,6 +458,208 @@ export function ProfilePageClient(props: Props) {
           {error && <p className="text-sm text-rose-400">{error}</p>}
         </section>
 
+        {anonymousSessionId && (latestItemIsQuestion || latestItemIsPoll) && (
+          <Card className="p-4 space-y-3 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow">
+            <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+              Latest message or poll
+            </h2>
+            {latestItemIsQuestion && latestQuestion && (
+              <div className="space-y-2">
+                {(() => {
+                  const sentTime = formatTime((latestQuestion as any).createdAt);
+                  const repliedTime = formatTime((latestQuestion as any).answeredAt);
+                  return (
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2 dark:border-slate-800 dark:bg-slate-900/60">
+                      <p className="text-sm text-slate-800 dark:text-slate-100 whitespace-pre-wrap">
+                        {latestQuestion.questionText}
+                      </p>
+                      {latestQuestion.isAnswered && latestQuestion.answerText && (
+                        <div className="space-y-2">
+                          <div className="rounded-lg bg-white border border-slate-200 p-2 text-sm text-slate-800 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100">
+                            {latestQuestion.answerText}
+                          </div>
+                          <ReactionBar
+                            questionId={latestQuestion.id}
+                            initialCounts={
+                              latestQuestion.reactionCounts ?? {
+                                heart: 0,
+                                laugh: 0,
+                                wow: 0
+                              }
+                            }
+                          />
+                        </div>
+                      )}
+                      {(sentTime || repliedTime) && (
+                        <div className="flex justify-end text-[11px] text-slate-500 dark:text-slate-500">
+                          <span>
+                            {sentTime && `Sent ${sentTime}`}
+                            {sentTime && repliedTime && " • "}
+                            {repliedTime && `Replied ${repliedTime}`}
+                          </span>
+                        </div>
+                      )}
+                      {!latestQuestion.isAnswered && (
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                          Waiting for a reply
+                        </p>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
+            {latestItemIsPoll && latestPoll && (
+              <div className="space-y-3">
+                <p className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
+                  {latestPoll.questionText ?? "Poll"}
+                </p>
+                {latestPoll.pollType === "yes_no" ? (
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      {latestPoll.options.map((option, index) => {
+                        const hasVoted = pollVotes[latestPoll.id] != null;
+                        const isChosen = pollVotes[latestPoll.id] === index;
+                        const isPending =
+                          pendingVotes[latestPoll.id] != null &&
+                          pendingVotes[latestPoll.id] === index;
+                        const ownerChosen =
+                          typeof latestPoll.ownerSelection === "number" &&
+                          latestPoll.ownerSelection === index;
+                        const optionTextClass = ownerChosen
+                          ? "text-sky-700 font-semibold dark:text-sky-300"
+                          : isChosen
+                            ? "text-emerald-400 font-medium dark:text-emerald-300"
+                            : isPending
+                              ? "text-slate-900 font-medium dark:text-slate-100"
+                              : "text-slate-800 dark:text-slate-200";
+                        return (
+                          <button
+                            key={option.optionText}
+                            type="button"
+                            disabled={hasVoted}
+                            onClick={() => {
+                              if (hasVoted) {
+                                return;
+                              }
+                              setPendingVotes(previous => ({
+                                ...previous,
+                                [latestPoll.id]: index
+                              }));
+                            }}
+                            className="w-full text-left"
+                          >
+                            <div className="flex items-center justify-between text-xs mb-1">
+                              <span className={optionTextClass}>{option.optionText}</span>
+                              {ownerChosen && (
+                                <span className="ml-1 text-[10px] text-sky-400">
+                                  Owner&apos;s choice
+                                </span>
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <Button
+                      type="button"
+                      disabled={
+                        pollVotes[latestPoll.id] != null ||
+                        pendingVotes[latestPoll.id] == null
+                      }
+                      onClick={() => {
+                        const pendingIndex = pendingVotes[latestPoll.id];
+                        if (
+                          pendingIndex == null ||
+                          pollVotes[latestPoll.id] != null
+                        ) {
+                          return;
+                        }
+                        handleVote(latestPoll.id, pendingIndex);
+                      }}
+                      fullWidth
+                    >
+                      {pollVotes[latestPoll.id] != null
+                        ? "Vote submitted"
+                        : "Confirm vote"}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      {latestPoll.options.map((option, index) => {
+                        const hasVoted = pollVotes[latestPoll.id] != null;
+                        const isChosen = pollVotes[latestPoll.id] === index;
+                        const isPending =
+                          pendingVotes[latestPoll.id] != null &&
+                          pendingVotes[latestPoll.id] === index;
+                        const ownerChosen =
+                          typeof latestPoll.ownerSelection === "number" &&
+                          latestPoll.ownerSelection === index;
+                        const optionTextClass = ownerChosen
+                          ? "text-sky-700 font-semibold dark:text-sky-300"
+                          : isChosen
+                            ? "text-emerald-400 font-medium dark:text-emerald-300"
+                            : isPending
+                              ? "text-slate-900 font-medium dark:text-slate-100"
+                              : "text-slate-800 dark:text-slate-200";
+                        return (
+                          <button
+                            key={option.optionText}
+                            type="button"
+                            disabled={hasVoted}
+                            onClick={() => {
+                              if (hasVoted) {
+                                return;
+                              }
+                              setPendingVotes(previous => ({
+                                ...previous,
+                                [latestPoll.id]: index
+                              }));
+                            }}
+                            className="w-full text-left"
+                          >
+                            <div className="flex items-center justify-between text-xs mb-1">
+                              <span className={optionTextClass}>{option.optionText}</span>
+                              {ownerChosen && (
+                                <span className="ml-1 text-[10px] text-sky-400">
+                                  Owner&apos;s choice
+                                </span>
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <Button
+                      type="button"
+                      disabled={
+                        pollVotes[latestPoll.id] != null ||
+                        pendingVotes[latestPoll.id] == null
+                      }
+                      onClick={() => {
+                        const pendingIndex = pendingVotes[latestPoll.id];
+                        if (
+                          pendingIndex == null ||
+                          pollVotes[latestPoll.id] != null
+                        ) {
+                          return;
+                        }
+                        handleVote(latestPoll.id, pendingIndex);
+                      }}
+                      fullWidth
+                    >
+                      {pollVotes[latestPoll.id] != null
+                        ? "Vote submitted"
+                        : "Confirm vote"}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </Card>
+        )}
+
         {anonymousSessionId && (
           <motion.section
             className="space-y-3"
@@ -479,7 +691,11 @@ export function ProfilePageClient(props: Props) {
                   initialKey="messages"
                   renderContent={activeKey => {
                     if (activeKey === "messages") {
-                      if (chatQuestions.length === 0) {
+                      const items =
+                        latestItemIsQuestion && latestQuestion
+                          ? chatQuestions.slice(1)
+                          : chatQuestions;
+                      if (items.length === 0) {
                         return (
                           <p className="text-sm text-slate-600 dark:text-slate-500">
                             Your messages and replies will appear here.
@@ -488,7 +704,7 @@ export function ProfilePageClient(props: Props) {
                       }
                       return (
                         <div className="space-y-3">
-                          {chatQuestions.map(question => {
+                          {items.map(question => {
                             const sentTime = formatTime(question.createdAt);
                             const repliedTime = formatTime(
                               (question as any).answeredAt
@@ -538,7 +754,9 @@ export function ProfilePageClient(props: Props) {
                         </div>
                       );
                     }
-                    if (polls.length === 0) {
+                    const pollItems =
+                      latestItemIsPoll && latestPoll ? polls.slice(1) : polls;
+                    if (pollItems.length === 0) {
                       return (
                         <p className="text-sm text-slate-600 dark:text-slate-500">
                           No polls yet.
@@ -547,7 +765,7 @@ export function ProfilePageClient(props: Props) {
                     }
                     return (
                       <StaggerContainer>
-                        {polls.map(poll => (
+                        {pollItems.map(poll => (
                           <Card
                             key={poll.id}
                             className="p-4 space-y-3 hover:shadow-lg hover:shadow-sky-500/20 transition-shadow"
